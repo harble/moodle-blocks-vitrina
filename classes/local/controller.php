@@ -569,11 +569,13 @@ class controller {
      *
      * @return void
      */
-    public static function include_templatecss() {
+    public static function include_templatecss(int $instanceid = 0) {
 
         global $CFG, $PAGE;
 
-        $template = get_config('block_vitrina', 'templatetype');
+        // $template = get_config('block_vitrina', 'templatetype');
+        $template = \block_vitrina\output\main::get_config_ex( $instanceid?:0,'block_vitrina', 'templatetype');
+
         $csspath = $CFG->dirroot . '/blocks/vitrina/templates/' . $template . '/styles.css';
 
         // If the template is not the default and a templace CSS file exist, include the CSS file.

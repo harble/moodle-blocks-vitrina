@@ -41,7 +41,7 @@ $PAGE->set_heading(get_string('catalog', 'block_vitrina'));
 $PAGE->set_title(get_string('catalog', 'block_vitrina'));
 
 $uniqueid = \block_vitrina\local\controller::get_uniqueid();
-\block_vitrina\local\controller::include_templatecss();
+\block_vitrina\local\controller::include_templatecss($instanceid);
 
 $bypage = get_config('block_vitrina', 'amount');
 if (empty($bypage)) {

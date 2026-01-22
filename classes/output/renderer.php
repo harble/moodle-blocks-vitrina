@@ -42,7 +42,11 @@ class renderer extends plugin_renderer_base {
     public function render_main(main $main): string {
         global $CFG;
 
-        $template = get_config('block_vitrina', 'templatetype');
+        $templateParams = $main->export_for_template($this);
+
+        // $template = get_config('block_vitrina', 'templatetype');
+        $template = main::get_config_ex( $templateParams->instanceid?:0,'block_vitrina', 'templatetype');
+
         $path = $CFG->dirroot . '/blocks/vitrina/templates/' . $template . '/main.mustache';
 
         if ($template != 'default' && file_exists($path)) {
@@ -51,7 +55,7 @@ class renderer extends plugin_renderer_base {
             $templatefile = 'block_vitrina/main';
         }
 
-        return $this->render_from_template($templatefile, $main->export_for_template($this));
+        return $this->render_from_template($templatefile, $templateParams);
     }
 
     /**
@@ -63,7 +67,11 @@ class renderer extends plugin_renderer_base {
     public function render_catalog(catalog $catalog): string {
         global $CFG;
 
-        $template = get_config('block_vitrina', 'templatetype');
+        $templateParams = $catalog->export_for_template($this);
+
+        // $template = get_config('block_vitrina', 'templatetype');
+        $template = main::get_config_ex( $templateParams->instanceid?:0,'block_vitrina', 'templatetype');
+
         $path = $CFG->dirroot . '/blocks/vitrina/templates/' . $template . '/catalog.mustache';
 
         if ($template != 'default' && file_exists($path)) {
@@ -72,7 +80,7 @@ class renderer extends plugin_renderer_base {
             $templatefile = 'block_vitrina/catalog';
         }
 
-        return $this->render_from_template($templatefile, $catalog->export_for_template($this));
+        return $this->render_from_template($templatefile, $templateParams);
     }
 
     /**
@@ -84,7 +92,10 @@ class renderer extends plugin_renderer_base {
     public function render_detail(detail $detail): string {
         global $CFG;
 
-        $template = get_config('block_vitrina', 'templatetype');
+        $templateParams = $detail->export_for_template($this);
+        // $template = get_config('block_vitrina', 'templatetype');
+        $template = main::get_config_ex( $templateParams->instanceid?:0,'block_vitrina', 'templatetype');
+
         $path = $CFG->dirroot . '/blocks/vitrina/templates/' . $template . '/detail.mustache';
 
         if ($template != 'default' && file_exists($path)) {
@@ -93,7 +104,7 @@ class renderer extends plugin_renderer_base {
             $templatefile = 'block_vitrina/detail';
         }
 
-        return $this->render_from_template($templatefile, $detail->export_for_template($this));
+        return $this->render_from_template($templatefile, $templateParams);
     }
 
     /**
@@ -107,7 +118,9 @@ class renderer extends plugin_renderer_base {
 
         static $shopmanager = null;
 
-        $template = get_config('block_vitrina', 'templatetype');
+        // $template = get_config('block_vitrina', 'templatetype');
+        $template = main::get_config_ex( $course->instanceid?:0,'block_vitrina', 'templatetype');
+
         $path = $CFG->dirroot . '/blocks/vitrina/templates/' . $template . '/course.mustache';
 
         if ($template != 'default' && file_exists($path)) {

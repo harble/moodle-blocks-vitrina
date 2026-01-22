@@ -192,7 +192,7 @@ class block_vitrina extends block_base {
 
         $this->content->text = $html;
 
-        \block_vitrina\local\controller::include_templatecss();
+        \block_vitrina\local\controller::include_templatecss($this->instance->id);
         $this->page->requires->js_call_amd('block_vitrina/main', 'catalog', [$uniqueid, $tabs[0], $this->instance->id, $amount]);
 
         return $this->content;
