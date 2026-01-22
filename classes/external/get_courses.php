@@ -140,12 +140,18 @@ class get_courses extends external_api {
             }
         }
 
+        $sort = '';
+
         if (count($categoriesids) == 0) {
             if (!empty($params['instanceid'])) {
                 $block = block_instance_by_id($params['instanceid']);
 
                 if ($block->config && count($block->config->categories) > 0) {
                     $categoriesids = $block->config->categories;
+                }
+
+                if ($block->config && $block->config->sort != '') {
+                    $sort = $block->config->sort;
                 }
             }
         }
@@ -155,7 +161,7 @@ class get_courses extends external_api {
             $params['view'],
             $categoriesids,
             $params['filters'],
-            '',
+            $sort ,
             $params['amount'],
             $params['initial']
         );
@@ -168,6 +174,7 @@ class get_courses extends external_api {
 
             $renderedcourse = new \stdClass();
             $renderedcourse->id = $course->id;
+            $course->instanceid = $instanceid;
             $renderedcourse->html = $renderer->render_course($course);
 
             $response[] = $renderedcourse;

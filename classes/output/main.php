@@ -98,9 +98,22 @@ class main implements renderable, templatable {
             'showicon' => \block_vitrina\local\controller::show_tabicon(),
             'showtext' => \block_vitrina\local\controller::show_tabtext(),
             'instanceid' => $this->instanceid,
-            'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
+            // 'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
+            'opendetailstarget' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'opendetailstarget'),
         ];
 
         return $defaultvariables;
+    }
+
+    public static function get_config_ex(int $instanceid = 0, $plugin = null, $name = null) {
+        if ($instanceid > 0) {
+            $block = block_instance_by_id($instanceid);
+
+            // var_dump($block->config);
+            if ($block->config && $block->config->$name != '') {
+                return $block->config->$name;
+            }
+        }
+        return get_config($plugin, $name);
     }
 }
