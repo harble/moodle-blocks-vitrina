@@ -90,6 +90,45 @@ class block_vitrina_edit_form extends block_edit_form {
             $options
         );
 
+        // ------- NEW ADDED
+        // Sort by default.
+        $sortOptions = [
+            'default' => get_string('sortdefault', 'block_vitrina'),
+            'startdate' => get_string('sortbystartdate', 'block_vitrina'),
+            'finishdate' => get_string('sortbyfinishdate', 'block_vitrina'),
+            'alphabetically' => get_string('sortalphabetically', 'block_vitrina'),
+        ];
+        $mform->addElement('select', 'config_sort', get_string('sortbydefault', 'block_vitrina'), $sortOptions);
+        // $mform->setDefault('config_sort', 1);
+        $mform->addHelpButton('config_sort', 'sortbydefault', 'block_vitrina');
+
+        // Open target type
+        $openOptions = [
+            '_blank' => get_string('opendetailstarget_blank', 'block_vitrina'),
+            '_self' => get_string('opendetailstarget_self', 'block_vitrina'),
+        ];
+        $mform->addElement('select', 'config_opendetailstarget', get_string('opendetailstarget', 'block_vitrina'), $openOptions);
+        // $mform->setDefault('config_opendetailstarget', 1);
+        $mform->addHelpButton('config_opendetailstarget', 'opendetailstarget', 'block_vitrina');
+
+        // Template type.
+        $templOptions = ['default' => get_string('default')];
+
+        $path = $CFG->dirroot . '/blocks/vitrina/templates/';
+        $files = array_diff(scandir($path), ['..', '.']);
+
+        foreach ($files as $file) {
+            if (is_dir($path . $file)) {
+                $templOptions[$file] = $file;
+            }
+        }
+
+        $mform->addElement('select', 'config_templatetype', get_string('templatetype', 'block_vitrina'), $templOptions);
+        // $mform->setDefault('config_templatetype', 1);
+        $mform->addHelpButton('config_templatetype', 'templatetype', 'block_vitrina');
+
+        // ------
+
         $editoroptions = ['maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->block->context];
 
         // Header HTML editor.
