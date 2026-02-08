@@ -245,6 +245,7 @@ if ($ADMIN->fulltree) {
         'startdate' => get_string('sortbystartdate', 'block_vitrina'),
         'finishdate' => get_string('sortbyfinishdate', 'block_vitrina'),
         'alphabetically' => get_string('sortalphabetically', 'block_vitrina'),
+        'code' => get_string('sortbycode', 'block_vitrina'),
     ];
 
     $name = 'block_vitrina/sortbydefault';
@@ -252,6 +253,15 @@ if ($ADMIN->fulltree) {
     $help = get_string('sortbydefault_help', 'block_vitrina');
     $setting = new admin_setting_configselect($name, $title, $help, 'default', $options);
     $settings->add($setting);
+
+    // Code field for sorting (only if code fields are available).
+    if (count($fields) > 0) {
+        $name = 'block_vitrina/codefield';
+        $title = get_string('codefield', 'block_vitrina');
+        $help = get_string('codefield_help', 'block_vitrina');
+        $setting = new admin_setting_configselect($name, $title, $help, 0, $fieldswithempty);
+        $settings->add($setting);
+    }
 
     $name = 'block_vitrina/opendetailstarget';
     $title = get_string('opendetailstarget', 'block_vitrina');

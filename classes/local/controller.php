@@ -45,6 +45,11 @@ class controller {
     protected static $cachedpremiumfield = null;
 
     /**
+     * @var int Cached code field id.
+     */
+    protected static $cachedcodefield = null;
+
+    /**
      * @var bool True if load full information about the course.
      */
     protected static $large = false;
@@ -87,7 +92,7 @@ class controller {
     /**
      * @var array List of available sorts.
      */
-    public const COURSES_SORTS = ['default', 'alphabetically', 'startdate', 'finishdate'];
+    public const COURSES_SORTS = ['default', 'alphabetically', 'startdate', 'finishdate', 'code'];
 
     /**
      * @var array List of available types in custom fields to filter.
@@ -437,6 +442,24 @@ class controller {
         }
 
         return self::$cachedpremiumfield ?? null;
+    }
+
+    /**
+     * Get the code field for sorting.
+     *
+     * @return object The code field.
+     */
+    public static function get_codefield(): ?object {
+        global $DB;
+
+        if (!self::$cachedcodefield) {
+            $codefield = get_config('block_vitrina', 'codefield');
+            if (!empty($codefield)) {
+                self::$cachedcodefield = $DB->get_record('customfield_field', ['id' => $codefield]);
+            }
+        }
+
+        return self::$cachedcodefield ?? null;
     }
 
     /**
@@ -803,6 +826,19 @@ class controller {
                 break;
             case 'alphabetically':
                 $sortby = 'c.fullname ASC';
+                break;
+            case 'code':
+                $codefield = self::get_codefield();
+                if ($codefield) {
+                    // Join to code custom field and sort by it
+                    $joincustomfields .= " LEFT JOIN {customfield_data} cfd_code ON " .
+                                        " c.id = cfd_code.instanceid AND cfd_code.fieldid = :codefielidid";
+                    $params['codefielidid'] = $codefield->id;
+                    $sortby = 'cfd_code.value ASC';
+                } else {
+                    // If code field not configured, use default sort
+                    $sortby = 'c.sortorder ASC';
+                }
                 break;
             default:
                 $sortby = 'c.sortorder ASC';

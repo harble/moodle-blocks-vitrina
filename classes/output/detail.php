@@ -515,6 +515,7 @@ class detail implements renderable, templatable {
             'enrolmsg' => $this->enrolmsg,
             // 'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
             'opendetailstarget' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'opendetailstarget'),
+            'instanceid' => $this->instanceid,  // instanceid 应该并不存在 ：（
         ];
 
         return $defaultvariables;

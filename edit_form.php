@@ -97,6 +97,7 @@ class block_vitrina_edit_form extends block_edit_form {
             'startdate' => get_string('sortbystartdate', 'block_vitrina'),
             'finishdate' => get_string('sortbyfinishdate', 'block_vitrina'),
             'alphabetically' => get_string('sortalphabetically', 'block_vitrina'),
+            'code' => get_string('sortbycode', 'block_vitrina'),
         ];
         $mform->addElement('select', 'config_sort', get_string('sortbydefault', 'block_vitrina'), $sortOptions);
         // $mform->setDefault('config_sort', 1);
