@@ -109,7 +109,7 @@ $summary = get_config('block_vitrina', 'summary');
 
 echo format_text($summary, FORMAT_HTML, ['trusted' => true, 'noclean' => true]);
 
-$renderable = new \block_vitrina\output\catalog($uniqueid, $view);
+$renderable = new \block_vitrina\output\catalog($uniqueid, $view, $instanceid);
 $renderer = $PAGE->get_renderer('block_vitrina');
 
 echo $renderer->render($renderable);

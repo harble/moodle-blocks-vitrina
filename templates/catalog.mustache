@@ -70,6 +70,26 @@
                     </div>
                 {{/fulltext}}
 
+                <div class="filtersortgroup">
+                    <label for="vitrina-sortby-{{uniqueid}}">{{#str}}sortlabel, block_vitrina{{/str}}</label>
+                    <div class="row">
+                        <div class="col-8 filtersort">
+                            <select id="vitrina-sortby-{{uniqueid}}" name="sort" class="form-control">
+                                {{#sortoptions}}
+                                    <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                                {{/sortoptions}}
+                            </select>
+                        </div>
+                        <div class="col-4 filtersortdirection">
+                            <select id="vitrina-sortdirection-{{uniqueid}}" name="sortdirection" class="form-control">
+                                {{#sortdirectionoptions}}
+                                    <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                                {{/sortdirectionoptions}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 {{#filtercontrols}}
                     <div class="filtercontrol" data-key="{{key}}">
                         <h5>{{title}}</h5>

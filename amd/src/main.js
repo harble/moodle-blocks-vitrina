@@ -143,11 +143,27 @@ function loadCourses(uniqueid, $tabcontent) {
     }
     // End of check active filters.
 
+    var sort = '';
+    var sortdirection = '';
+
+    if ($filtersbox) {
+        var $sortcontrol = $filtersbox.find('.filtersort select[name="sort"]');
+        if ($sortcontrol.length > 0) {
+            sort = $sortcontrol.val();
+        }
+
+        var $sortdirectioncontrol = $filtersbox.find('.filtersortdirection select[name="sortdirection"]');
+        if ($sortdirectioncontrol.length > 0) {
+            sortdirection = $sortdirectioncontrol.val();
+        }
+    }
+
     loading = true;
     Ajax.call([{
         methodname: 'block_vitrina_get_courses',
         args: {'view': view, 'filters': filters, 'instanceid': instanceid[uniqueid],
-                'amount': bypage[uniqueid], 'initial': paging[uniqueid][view].loaded},
+            'amount': bypage[uniqueid], 'initial': paging[uniqueid][view].loaded,
+            'sort': sort, 'sortdirection': sortdirection},
         done: function(data) {
 
             if (data && data.length > 0) {
@@ -375,6 +391,8 @@ export const filters = (uniqueid, selectedfilters = []) => {
     });
 
     $filtersbox.find('.filtercontrol .filteroptions input').on('change', applyFilters);
+    $filtersbox.find('.filtersort select[name="sort"]').on('change', applyFilters);
+    $filtersbox.find('.filtersortdirection select[name="sortdirection"]').on('change', applyFilters);
 
     $filtersbox.find('.filterfulltext button').on('click', applyFilters);
     $filtersbox.find('.filterfulltext input').on('keypress', function(e) {

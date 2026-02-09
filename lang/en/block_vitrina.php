@@ -164,6 +164,7 @@ $string['sortdirection'] = 'Sort direction';
 $string['sortdirection_help'] = 'Choose the direction in which the courses are sorted.';
 $string['sortdirection_asc'] = 'Ascending';
 $string['sortdirection_desc'] = 'Descending';
+$string['sortlabel'] = 'Sort';
 $string['staticfilters'] = 'Static filters';
 $string['staticfilters_help'] = 'Select the specific filter to use in the catalog.';
 $string['summary'] = 'Summary';

@@ -70,7 +70,8 @@ class get_courses extends external_api {
                 'instanceid' => new external_value(PARAM_INT, 'Block instance id', VALUE_DEFAULT, 0),
                 'amount' => new external_value(PARAM_INT, 'Amount of courses', VALUE_DEFAULT, 0),
                 'initial' => new external_value(PARAM_INT, 'From where to start', VALUE_DEFAULT, 0),
-                'sortdirection' => new external_value(PARAM_TEXT, 'Sort direction (asc or desc)', VALUE_DEFAULT, 'asc'),
+                'sort' => new external_value(PARAM_TEXT, 'Sort key', VALUE_DEFAULT, ''),
+                'sortdirection' => new external_value(PARAM_TEXT, 'Sort direction (asc or desc)', VALUE_DEFAULT, ''),
             ]
         );
     }
@@ -83,6 +84,7 @@ class get_courses extends external_api {
      * @param int $instanceid Block instance id
      * @param int $amount Amount of courses
      * @param int $initial From where to start
+     * @param string $sort Sort key
      * @param string $sortdirection Sort direction (asc or desc)
      * @return array Courses list
      */
@@ -92,7 +94,8 @@ class get_courses extends external_api {
         int $instanceid = 0,
         int $amount = 0,
         int $initial = 0,
-        string $sortdirection = 'asc'
+        string $sort = '',
+        string $sortdirection = ''
     ): array {
 
         global $PAGE, $CFG;
@@ -115,6 +118,7 @@ class get_courses extends external_api {
                 'instanceid' => $instanceid,
                 'amount' => $amount,
                 'initial' => $initial,
+                'sort' => $sort,
                 'sortdirection' => $sortdirection,
             ]
         );
@@ -144,7 +148,7 @@ class get_courses extends external_api {
             }
         }
 
-        $sort = '';
+        $sort = $params['sort'];
         $sortdirection = $params['sortdirection'];
 
         if (count($categoriesids) == 0) {
@@ -155,11 +159,11 @@ class get_courses extends external_api {
                     $categoriesids = $block->config->categories;
                 }
 
-                if ($block->config && $block->config->sort != '') {
+                if ($block->config && $block->config->sort != '' && empty($sort)) {
                     $sort = $block->config->sort;
                 }
 
-                if ($block->config && !empty($block->config->sortdirection)) {
+                if ($block->config && !empty($block->config->sortdirection) && empty($sortdirection)) {
                     $sortdirection = $block->config->sortdirection;
                 }
             }

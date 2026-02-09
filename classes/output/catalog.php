@@ -45,15 +45,21 @@ class catalog implements renderable, templatable {
     private $view;
 
     /**
+     * @var int The block instance id.
+     */
+    private $instanceid;
+
+    /**
      * Constructor.
      *
      * @param string $uniqueid The uniqueid of the block instance.
      * @param string $view The view type.
      */
-    public function __construct($uniqueid, $view = 'default') {
+    public function __construct($uniqueid, $view = 'default', int $instanceid = 0) {
 
         $this->uniqueid = $uniqueid;
         $this->view = $view;
+        $this->instanceid = $instanceid;
     }
 
     /**
@@ -128,6 +134,47 @@ class catalog implements renderable, templatable {
         }
         // End of filter controls.
 
+        $sortvalue = main::get_config_ex($this->instanceid ?: 0, 'block_vitrina', 'sortbydefault');
+        if (empty($sortvalue)) {
+            $sortvalue = 'default';
+        }
+
+        $sortdirectionvalue = main::get_config_ex($this->instanceid ?: 0, 'block_vitrina', 'sortdirection');
+        if (empty($sortdirectionvalue)) {
+            $sortdirectionvalue = 'asc';
+        }
+
+        $sortlabels = [
+            'default' => get_string('sortdefault', 'block_vitrina'),
+            'startdate' => get_string('sortbystartdate', 'block_vitrina'),
+            'finishdate' => get_string('sortbyfinishdate', 'block_vitrina'),
+            'alphabetically' => get_string('sortalphabetically', 'block_vitrina'),
+            'code' => get_string('sortbycode', 'block_vitrina'),
+        ];
+
+        $sortoptions = [];
+        foreach ($sortlabels as $value => $label) {
+            $option = new \stdClass();
+            $option->value = $value;
+            $option->label = $label;
+            $option->selected = $value === $sortvalue;
+            $sortoptions[] = $option;
+        }
+
+        $sortdirectionlabels = [
+            'asc' => get_string('sortdirection_asc', 'block_vitrina'),
+            'desc' => get_string('sortdirection_desc', 'block_vitrina'),
+        ];
+
+        $sortdirectionoptions = [];
+        foreach ($sortdirectionlabels as $value => $label) {
+            $option = new \stdClass();
+            $option->value = $value;
+            $option->label = $label;
+            $option->selected = $value === $sortdirectionvalue;
+            $sortdirectionoptions[] = $option;
+        }
+
         $defaultvariables = [
             'uniqueid' => $this->uniqueid,
             'baseurl' => $CFG->wwwroot,
@@ -137,6 +184,8 @@ class catalog implements renderable, templatable {
             'showtext' => \block_vitrina\local\controller::show_tabtext(),
             'filtercontrols' => $filtercontrols,
             'filterproperties' => $filterproperties,
+            'sortoptions' => $sortoptions,
+            'sortdirectionoptions' => $sortdirectionoptions,
             'catfilterview' => $catfilterview,
             // 'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
             'opendetailstarget' => main::get_config_ex( $this->instanceid?: 0,'block_vitrina', 'opendetailstarget'),
