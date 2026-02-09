@@ -72,6 +72,7 @@ $string['filtercustomfields'] = 'Custom fields to filter';
 $string['filtercustomfields_help'] = 'Select the custom fields to filter the courses in the catalog.
 Only select and check fields are available to filter.';
 $string['fulltextsearch'] = 'Full text search';
+$string['fulltextsearch_placeholder'] = 'Search courses';
 $string['gotocourse'] = 'Go to course';
 $string['greats'] = 'Greats';
 $string['hascourseview'] = 'You have access to this course!';

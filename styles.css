@@ -778,12 +778,12 @@
 
 .filtersortgroup .row .filtersort {
     padding-right: 2px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
 }
 
 .filtersortgroup .row .filtersortdirection {
     padding-left: 1px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
 }
 
 /* End of Filter controls */
