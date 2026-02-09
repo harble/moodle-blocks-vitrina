@@ -103,6 +103,14 @@ class block_vitrina_edit_form extends block_edit_form {
         // $mform->setDefault('config_sort', 1);
         $mform->addHelpButton('config_sort', 'sortbydefault', 'block_vitrina');
 
+        // Sort direction.
+        $directionOptions = [
+            'asc' => get_string('sortdirection_asc', 'block_vitrina'),
+            'desc' => get_string('sortdirection_desc', 'block_vitrina'),
+        ];
+        $mform->addElement('select', 'config_sortdirection', get_string('sortdirection', 'block_vitrina'), $directionOptions);
+        $mform->addHelpButton('config_sortdirection', 'sortdirection', 'block_vitrina');
+
         // Open target type
         $openOptions = [
             '_blank' => get_string('opendetailstarget_blank', 'block_vitrina'),

@@ -70,6 +70,7 @@ class get_courses extends external_api {
                 'instanceid' => new external_value(PARAM_INT, 'Block instance id', VALUE_DEFAULT, 0),
                 'amount' => new external_value(PARAM_INT, 'Amount of courses', VALUE_DEFAULT, 0),
                 'initial' => new external_value(PARAM_INT, 'From where to start', VALUE_DEFAULT, 0),
+                'sortdirection' => new external_value(PARAM_TEXT, 'Sort direction (asc or desc)', VALUE_DEFAULT, 'asc'),
             ]
         );
     }
@@ -82,6 +83,7 @@ class get_courses extends external_api {
      * @param int $instanceid Block instance id
      * @param int $amount Amount of courses
      * @param int $initial From where to start
+     * @param string $sortdirection Sort direction (asc or desc)
      * @return array Courses list
      */
     public static function execute(
@@ -89,7 +91,8 @@ class get_courses extends external_api {
         array $filters = [],
         int $instanceid = 0,
         int $amount = 0,
-        int $initial = 0
+        int $initial = 0,
+        string $sortdirection = 'asc'
     ): array {
 
         global $PAGE, $CFG;
@@ -112,6 +115,7 @@ class get_courses extends external_api {
                 'instanceid' => $instanceid,
                 'amount' => $amount,
                 'initial' => $initial,
+                'sortdirection' => $sortdirection,
             ]
         );
 
@@ -141,6 +145,7 @@ class get_courses extends external_api {
         }
 
         $sort = '';
+        $sortdirection = $params['sortdirection'];
 
         if (count($categoriesids) == 0) {
             if (!empty($params['instanceid'])) {
@@ -153,6 +158,10 @@ class get_courses extends external_api {
                 if ($block->config && $block->config->sort != '') {
                     $sort = $block->config->sort;
                 }
+
+                if ($block->config && !empty($block->config->sortdirection)) {
+                    $sortdirection = $block->config->sortdirection;
+                }
             }
         }
         // End of read categories.
@@ -161,7 +170,8 @@ class get_courses extends external_api {
             $params['view'],
             $categoriesids,
             $params['filters'],
-            $sort ,
+            $sort,
+            $sortdirection,
             $params['amount'],
             $params['initial']
         );

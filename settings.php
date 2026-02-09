@@ -254,6 +254,17 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configselect($name, $title, $help, 'default', $options);
     $settings->add($setting);
 
+    // Sort direction.
+    $name = 'block_vitrina/sortdirection';
+    $title = get_string('sortdirection', 'block_vitrina');
+    $help = get_string('sortdirection_help', 'block_vitrina');
+    $options = [
+        'asc' => get_string('sortdirection_asc', 'block_vitrina'),
+        'desc' => get_string('sortdirection_desc', 'block_vitrina'),
+    ];
+    $setting = new admin_setting_configselect($name, $title, $help, 'asc', $options);
+    $settings->add($setting);
+
     // Code field for sorting (only if code fields are available).
     if (count($fields) > 0) {
         $name = 'block_vitrina/codefield';

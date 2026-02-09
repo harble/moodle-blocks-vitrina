@@ -652,6 +652,7 @@ class controller {
      * @param array $categoriesids The categories ids.
      * @param array $filters A filters objects list with type and value.
      * @param string $sort The sort.
+     * @param string $sortdirection The sort direction (asc or desc).
      * @param int $amount The amount of courses to get.
      * @param int $initial From where to start counting the next courses to get.
      * @return array The courses list.
@@ -661,6 +662,7 @@ class controller {
         array $categoriesids = [],
         array $filters = [],
         string $sort = '',
+        string $sortdirection = 'asc',
         int $amount = 0,
         int $initial = 0
     ): array {
@@ -673,6 +675,13 @@ class controller {
 
         if (empty($sort) || !in_array($sort, self::COURSES_SORTS)) {
             $sort = get_config('block_vitrina', 'sortbydefault');
+        }
+
+        // Validate and set sort direction.
+        $sortdirection = strtoupper($sortdirection);
+        if (!in_array($sortdirection, ['ASC', 'DESC'])) {
+            $sortdirectionconfig = get_config('block_vitrina', 'sortdirection');
+            $sortdirection = ($sortdirectionconfig === 'desc') ? 'DESC' : 'ASC';
         }
 
         if (empty($amount)) {
@@ -818,14 +827,19 @@ class controller {
         // Create the order by according the sort.
         switch ($sort) {
             case 'startdate':
-                $sortby = 'c.startdate ASC';
+                $sortby = "c.startdate $sortdirection";
                 break;
             case 'finishdate':
-                $sortby = 'endtype ASC, c.enddate ASC, c.startdate DESC';
+                // For finish date, we need special handling
+                if ($sortdirection === 'ASC') {
+                    $sortby = 'endtype ASC, c.enddate ASC, c.startdate DESC';
+                } else {
+                    $sortby = 'endtype DESC, c.enddate DESC, c.startdate ASC';
+                }
                 $specialfields = ", CASE WHEN c.enddate = 0 THEN 2 ELSE 1 END AS endtype";
                 break;
             case 'alphabetically':
-                $sortby = 'c.fullname ASC';
+                $sortby = "c.fullname $sortdirection";
                 break;
             case 'code':
                 $codefield = self::get_codefield();
@@ -834,14 +848,14 @@ class controller {
                     $joincustomfields .= " LEFT JOIN {customfield_data} cfd_code ON " .
                                         " c.id = cfd_code.instanceid AND cfd_code.fieldid = :codefielidid";
                     $params['codefielidid'] = $codefield->id;
-                    $sortby = 'cfd_code.value ASC';
+                    $sortby = "cfd_code.value $sortdirection";
                 } else {
                     // If code field not configured, use default sort
-                    $sortby = 'c.sortorder ASC';
+                    $sortby = "c.sortorder $sortdirection";
                 }
                 break;
             default:
-                $sortby = 'c.sortorder ASC';
+                $sortby = "c.sortorder $sortdirection";
         }
 
         switch ($view) {
