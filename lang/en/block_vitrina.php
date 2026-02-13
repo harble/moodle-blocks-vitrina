@@ -72,7 +72,6 @@ $string['filtercustomfields'] = 'Custom fields to filter';
 $string['filtercustomfields_help'] = 'Select the custom fields to filter the courses in the catalog.
 Only select and check fields are available to filter.';
 $string['fulltextsearch'] = 'Full text search';
-$string['fulltextsearch_placeholder'] = 'Search courses';
 $string['gotocourse'] = 'Go to course';
 $string['greats'] = 'Greats';
 $string['hascourseview'] = 'You have access to this course!';
@@ -165,7 +164,7 @@ $string['sortdirection'] = 'Sort direction';
 $string['sortdirection_help'] = 'Choose the direction in which the courses are sorted.';
 $string['sortdirection_asc'] = 'Ascending';
 $string['sortdirection_desc'] = 'Descending';
-$string['sortlabel'] = 'Sort';
+$string['sortlabel'] = 'Sort Type';
 $string['staticfilters'] = 'Static filters';
 $string['staticfilters_help'] = 'Select the specific filter to use in the catalog.';
 $string['summary'] = 'Summary';
