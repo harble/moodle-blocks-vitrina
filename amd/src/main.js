@@ -310,6 +310,28 @@ export const init = (uniqueid = null) => {
                     });
                 });
             });
+
+            // Make each course box clickable to open detail page.
+            $blockcontent.on('click', '.block_vitrina-courseslist .coursebox', function(e) {
+                var $target = $(e.target);
+
+                // Do not hijack clicks on interactive elements (links, buttons, form controls).
+                if ($target.closest('a, button, input, select, textarea').length) {
+                    return;
+                }
+
+                var $box = $(this);
+                var url = $box.data('vitrina-detailurl');
+                var target = $box.data('vitrina-detailtarget') || '_self';
+
+                if (url) {
+                    if (target === '_blank') {
+                        window.open(url, '_blank');
+                    } else {
+                        window.location.href = url;
+                    }
+                }
+            });
         });
     }
 };

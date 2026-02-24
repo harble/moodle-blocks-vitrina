@@ -120,6 +120,13 @@ class controller {
     public const PREMIUMBYCOHORT = 'cohort';
 
     /**
+     * Cached first dropdown-type custom field configured for filtering (used as course type).
+     *
+     * @var \stdClass|false|null
+     */
+    protected static $coursetypefield = null;
+
+    /**
      * Process a specific course to be displayed.
      *
      * @param object $course Course to be processed.
@@ -174,6 +181,9 @@ class controller {
         }
 
         $course->imagepath = self::get_courseimage($course);
+
+        // Load course type (first dropdown-type configured custom field), if any.
+        self::load_coursetype_for_course($course);
 
         $ratemanager = self::get_ratemanager();
         $ratingavailable = $ratemanager::rating_available();
@@ -395,6 +405,100 @@ class controller {
                 }
             }
         }
+    }
+
+    /**
+     * Load the course type information (based on the first configured dropdown custom field).
+     *
+     * @param object $course Course object.
+     * @return void
+     */
+    protected static function load_coursetype_for_course(object $course): void {
+        // Resolve and cache the field used as course type.
+        if (self::$coursetypefield === null) {
+            $customfields = self::get_configuredcustomfields();
+
+            self::$coursetypefield = false;
+
+            foreach ($customfields as $field) {
+                if ($field->type === 'select' || $field->type === 'multiselect') {
+                    self::$coursetypefield = $field;
+                    break;
+                }
+            }
+        }
+
+        if (self::$coursetypefield === false) {
+            // No suitable field configured.
+            $course->hascoursetype = false;
+            return;
+        }
+
+        $field = self::$coursetypefield;
+
+        // Use core customfield API to get the human-readable value.
+        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        if (!$handler) {
+            $course->hascoursetype = false;
+            return;
+        }
+
+        $datas = $handler->get_instance_data($course->id);
+
+        $label = '';
+        foreach ($datas as $data) {
+            if ((int)$data->get_field()->get('id') === (int)$field->id) {
+                $value = $data->export_value();
+                if (is_string($value)) {
+                    $value = trim($value);
+                }
+
+                if (!empty($value)) {
+                    $label = (string)$value;
+                }
+                break;
+            }
+        }
+
+        if ($label === '') {
+            $course->hascoursetype = false;
+            return;
+        }
+
+        $course->hascoursetype = true;
+        $course->coursetype = $label;
+        $course->coursetypeiconhtml = self::get_coursetype_icon_html($label);
+    }
+
+    /**
+     * Get icon HTML for a given course type label.
+     *
+     * @param string $label Course type label.
+     * @return string Safe HTML snippet with a Boost/FontAwesome icon.
+     */
+    protected static function get_coursetype_icon_html(string $label): string {
+        // Normalise label for matching.
+        $norm = \core_text::strtolower(trim($label));
+
+        // Default icon.
+        $icon = 'book';
+
+        // Simple heuristics based on common Chinese and English terms.
+        if (strpos($norm, '电子') !== false || strpos($norm, '线上') !== false ||
+                strpos($norm, '网课') !== false || strpos($norm, 'online') !== false ||
+                strpos($norm, 'e-learning') !== false || strpos($norm, 'elearning') !== false) {
+            $icon = 'desktop';
+        } else if (strpos($norm, '直播') !== false || strpos($norm, 'live') !== false) {
+            $icon = 'video-camera';
+        } else if (strpos($norm, '线下') !== false || strpos($norm, '面授') !== false ||
+                strpos($norm, 'offline') !== false || strpos($norm, 'classroom') !== false) {
+            $icon = 'users';
+        }
+
+        $icon = preg_replace('/[^a-z0-9\-]/', '', $icon);
+
+        // Use Boost/FontAwesome icon classes.
+        return '<span class="vitrina-course-type-icon"><i class="icon fa fa-' . $icon . ' fa-fw" aria-hidden="true"></i></span>';
     }
 
     /**

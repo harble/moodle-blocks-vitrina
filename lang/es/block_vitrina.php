@@ -62,6 +62,7 @@ $string['detailinfo_help'] = 'Información general para la vista de detalles de 
 $string['enroll'] = 'Matricular';
 $string['enrollavailablepremium'] = 'Matrícula disponible por ser usuario premium';
 $string['enrolled'] = '¡Ya se encuentra matriculado en el curso!';
+$string['enrolledshort'] = 'MATRIC.';
 $string['enrolledended'] = 'Se encuentra matriculado en este curso pero su inscripción está inactiva en este momento';
 $string['enrollrequired'] = '¡Matricúlate para tomar el curso!';
 $string['filtercustomfields'] = 'Filtrar por campos personalizados';

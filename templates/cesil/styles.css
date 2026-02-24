@@ -63,6 +63,7 @@
 
 .block_vitrina-courseslist .coursebox .panel-foot {
     padding-bottom: 0;
+    border-top: 1px solid #e7e7e7;
 }
 
 .block_vitrina-courseslist .coursebox .panel-foot .btn {
@@ -77,6 +78,36 @@
     color: #f1f1f1;
     background-color: #666;
     border-color: #666;
+}
+
+.block_vitrina-courseslist .coursebox .course-extra-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px 10px;
+    font-size: 90%;
+}
+
+.block_vitrina-courseslist .coursebox .course-type-left {
+    display: flex;
+    align-items: center;
+}
+
+.block_vitrina-courseslist .coursebox .course-type-label {
+    margin-left: 2px;
+}
+
+.block_vitrina-courseslist .coursebox .course-enrolled-right {
+    text-align: right;
+    font-weight: bold;
+}
+
+.block_vitrina-courseslist .coursebox .course-enrolled-label {
+    color: #aaaaaa;
+}
+
+.block_vitrina-courseslist .coursebox .vitrina-course-type-icon .icon {
+    margin: 0;
 }
 
 .block_vitrina-courseslist .coursebox.state-waiting .panel-body::after {

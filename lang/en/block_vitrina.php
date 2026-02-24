@@ -64,6 +64,7 @@ $string['detailinfo_help'] = 'General info about the course detail.';
 $string['enroll'] = 'Enroll';
 $string['enrollavailablepremium'] = 'Enroll available for premium users';
 $string['enrolled'] = 'You are enrolled currently!';
+$string['enrolledshort'] = 'enrolled';
 $string['enrolledended'] = 'You are enrolled in this course but your registration is currently inactive';
 $string['enrollrequired'] = 'You need to enroll to take the course!';
 $string['feeinfo'] = '{$a}';
