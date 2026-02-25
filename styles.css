@@ -68,6 +68,16 @@
     display: block;
 }
 
+.block_vitrina-courseslist .coursebox .panel-body a,
+.block_vitrina-courseslist .coursebox > a.courseimage-link {
+    transition: filter .2s ease-in-out;
+}
+
+.block_vitrina-courseslist .coursebox .panel-body a:hover,
+.block_vitrina-courseslist .coursebox > a.courseimage-link:hover {
+    filter: opacity(0.9);
+}
+
 .block_vitrina-courseslist .coursebox .panel-body a.btn-primary {
     color: #fff;
 }

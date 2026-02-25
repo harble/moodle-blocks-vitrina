@@ -61,6 +61,16 @@
     margin-bottom: 10px;
 }
 
+.block_vitrina-courseslist .coursebox .panel-body a,
+.block_vitrina-courseslist .coursebox .courseimage-link {
+    transition: filter .2s ease-in-out;
+}
+
+.block_vitrina-courseslist .coursebox .panel-body a:hover,
+.block_vitrina-courseslist .coursebox .courseimage-link:hover {
+    filter: opacity(0.9);
+}
+
 .block_vitrina-courseslist .coursebox .panel-foot {
     padding-bottom: 0;
     border-top: 1px solid #e7e7e7;
