@@ -41,6 +41,7 @@
 .block_vitrina-courseslist .coursebox .panel-body h3.course-name {
     padding-inline: 20px;
     text-align: left;
+    font-size: 1.1rem;
 }
 
 .block_vitrina-courseslist .coursebox .panel-body .coursesummary {
