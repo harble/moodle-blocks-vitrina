@@ -42,7 +42,7 @@
 }}
 
 <div class="panel panel-default coursebox coursecategory-{{category}} state-{{#active}}active{{/active}}{{^active}}waiting{{/active}} {{#premium}}type-premium{{/premium}}{{#completed}} coursecompleted{{/completed}}">
-    <a class="courseimage-link" title="{{{shortname}}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
+    <a class="courseimage-link" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
         <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}>
             {{#hassummary}}
                 <div class="course_description" style="display: none;">
