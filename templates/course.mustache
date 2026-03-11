@@ -45,7 +45,7 @@
     <a class="courseimage-link" title="{{{shortname}}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
         <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}>
             {{#hassummary}}
-                <div class="course_description">
+                <div class="course_description" style="display: none;">
                     {{{summary}}}
                 </div>
             {{/hassummary}}
@@ -83,12 +83,21 @@
                 <span>{{#str}}completepercent, block_vitrina, {{progress}}{{/str}}</span>
             </div>
         {{/hasprogress}}
-        <a class="coursebtn submit btn btn-info btn-sm" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
-            <span class="get_stringlink">
-                {{#str}} showmore, block_vitrina {{/str}}
-                {{#pix}} i/next, core, {{#str}} showmore, block_vitrina {{/str}} {{/pix}}
-            </span>
-        </a>
+        <div class="course-extra-row">
+            <div class="course-type-left">
+                {{#hascoursetype}}
+                    <span class="course-type">
+                        {{{coursetypeiconhtml}}}
+                        <span class="course-type-label">{{coursetype}}</span>
+                    </span>
+                {{/hascoursetype}}
+            </div>
+            <div class="course-enrolled-right">
+                {{#enrolled}}
+                    <span class="course-enrolled-label">{{#str}} enrolledshort, block_vitrina {{/str}}</span>
+                {{/enrolled}}
+            </div>
+        </div>
     </div>
     {{^active}}
         <div class="waiting-label">{{#str}}waiting, block_vitrina{{/str}}</div>
