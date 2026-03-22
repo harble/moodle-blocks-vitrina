@@ -127,6 +127,68 @@ class controller {
     protected static $coursetypefield = null;
 
     /**
+     * Remove auto-loading internal media references from a summary HTML fragment.
+     *
+     * Any media elements which point at pluginfile.php or use the @@PLUGINFILE@@
+     * placeholder are stripped so that the browser does not perform background
+     * requests to protected files, which can interfere with login redirect
+     * behaviour when sessions expire.
+     *
+     * @param string $summary
+     * @return string
+     */
+    private static function sanitize_summary(string $summary): string {
+        global $CFG;
+
+        if ($summary === '') {
+            return $summary;
+        }
+
+        $pluginfilebase = preg_quote($CFG->wwwroot . '/pluginfile.php', '/');
+        $pluginfileplaceholder = preg_quote('@@PLUGINFILE@@', '/');
+
+        // Remove tags whose media-related attributes point directly to pluginfile.php
+        // or use the @@PLUGINFILE@@ placeholder.
+        // Tags: img, video, audio, iframe, embed, object, source.
+        // Attributes: src, srcset, data, poster.
+        $summary = preg_replace(
+            '/<(img|video|audio|iframe|embed|object|source)[^>]+'
+            . '(src|srcset|data|poster)\s*=\s*"(' . $pluginfilebase . '|' . $pluginfileplaceholder . ')[^" ]*"[^>]*>/i',
+            '',
+            $summary
+        );
+        $summary = preg_replace(
+            "/<(img|video|audio|iframe|embed|object|source)[^>]+"
+            . "(src|srcset|data|poster)\s*=\s*'(" . $pluginfilebase . '|' . $pluginfileplaceholder . ")[^' ]*'[^>]*>/i",
+            '',
+            $summary
+        );
+
+        // Remove entire <audio>...</audio> or <video>...</video> blocks which contain
+        // any pluginfile.php URL or @@PLUGINFILE@@ placeholder inside their content.
+        $summary = preg_replace(
+            '/<audio\b[^>]*>.*?(' . $pluginfilebase . '|' . $pluginfileplaceholder . ').*?<\/audio>/is',
+            '',
+            $summary
+        );
+        $summary = preg_replace(
+            '/<video\b[^>]*>.*?(' . $pluginfilebase . '|' . $pluginfileplaceholder . ').*?<\/video>/is',
+            '',
+            $summary
+        );
+
+        // Finally, remove any bare pluginfile.php URLs or @@PLUGINFILE@@ placeholders
+        // that might remain in text nodes.
+        $summary = preg_replace(
+            '/(' . $pluginfilebase . '|' . $pluginfileplaceholder . ')[^\s"<\']*/i',
+            '',
+            $summary
+        );
+
+        return $summary;
+    }
+
+    /**
      * Process a specific course to be displayed.
      *
      * @param object $course Course to be processed.
@@ -141,9 +203,10 @@ class controller {
         $course->haspaymentgw = false;
         $course->paymenturl = null;
         $course->baseurl = $CFG->wwwroot;
-        $course->hassummary = !empty($course->summary);
         $course->fullname = format_string($course->fullname, true, ['context' => \context_course::instance($course->id)]);
         $course->summary = format_text($course->summary, $course->summaryformat);
+        $course->summary = self::sanitize_summary($course->summary);
+        $course->hassummary = !empty($course->summary);
 
         $payfield = self::get_payfield();
         if (!$isuserpremium) {
@@ -337,11 +400,12 @@ class controller {
 
                 // Load other info about the courses.
                 foreach ($coursesinfo as $one) {
-                    $one->hassummary = !empty($one->summary);
                     $one->imagepath = self::get_courseimage($one);
                     $one->active = $one->startdate <= time();
                     $one->fullname = format_string($one->fullname, true, ['context' => \context_course::instance($one->id)]);
                     $one->summary = format_text($one->summary, $course->summaryformat);
+                    $one->summary = self::sanitize_summary($one->summary);
+                    $one->hassummary = !empty($one->summary);
 
                     if (!$isuserpremium && $payfield) {
                         $one->paymenturl = $DB->get_field(
