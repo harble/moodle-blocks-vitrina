@@ -695,6 +695,13 @@
 
 .block_vitrina-tabcontent .loadmore {
     width: 100%;
+    background-color: transparent;
+    color: #8d7e78;
+    border-color: #8d7e78;
+}
+
+.block_vitrina-tabcontent .loadmore:hover {
+    background-color: #aaaaaa;
 }
 
 .block_vitrina-tabcontent .nocourses {
