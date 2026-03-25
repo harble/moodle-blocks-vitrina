@@ -68,6 +68,9 @@
 
 .block_vitrina-courseslist .coursebox h6 {
     color: var(--primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .block_vitrina-courseslist .coursebox .vitrina-ranking-stars {

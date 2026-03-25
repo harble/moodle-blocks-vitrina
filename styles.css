@@ -68,6 +68,14 @@
     display: block;
 }
 
+.block_vitrina-courseslist .coursebox .panel-body a.course-subject {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
 .block_vitrina-courseslist .coursebox .panel-body a,
 .block_vitrina-courseslist .coursebox > a.courseimage-link {
     transition: filter .2s ease-in-out;
