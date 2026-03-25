@@ -46,13 +46,6 @@
         <a class="" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
             <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}></div>
         </a>
-        {{#hasrating}}
-            {{#rating}}
-            <div class="vitrina-ranking-stars">
-                <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
-            </div>
-            {{/rating}}
-        {{/hasrating}}
         <h3 class="course-name">
             {{{fullname}}}
         </h3>
@@ -85,6 +78,15 @@
                         <span class="course-type-label">{{coursetype}}</span>
                     </span>
                 {{/hascoursetype}}
+            </div>
+            <div class="course-rating-center">
+                {{#hasrating}}
+                    {{#rating}}
+                    <div class="vitrina-ranking-stars" title="{{title}}">
+                        <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
+                    </div>
+                    {{/rating}}
+                {{/hasrating}}
             </div>
             <div class="course-enrolled-right">
                 {{#enrolled}}

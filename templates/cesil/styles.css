@@ -74,6 +74,13 @@
 .block_vitrina-courseslist .coursebox .panel-foot {
     padding-bottom: 0;
     border-top: 1px solid #e7e7e7;
+    padding: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.coursebox .vitrina-ranking-stars {
+    transform-origin: center;
 }
 
 .block_vitrina-courseslist .coursebox .panel-foot .btn {
@@ -101,6 +108,15 @@
 .block_vitrina-courseslist .coursebox .course-type-left {
     display: flex;
     align-items: center;
+}
+
+.block_vitrina-courseslist .coursebox .course-rating-center {
+	display: flex;
+	justify-content: center;
+}
+
+.block_vitrina-courseslist .coursebox .course-rating-center .vitrina-ranking-stars {
+	margin-left: 0;
 }
 
 .block_vitrina-courseslist .coursebox .course-type-label {

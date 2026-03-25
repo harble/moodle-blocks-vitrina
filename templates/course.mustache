@@ -52,14 +52,6 @@
         </div>
     </a>
     <div class="panel-heading">
-        {{#hasrating}}
-            {{#rating}}
-            <div class="vitrina-ranking-stars">
-                <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
-                {{#pix}}stars_empty, block_vitrina{{/pix}}
-            </div>
-            {{/rating}}
-        {{/hasrating}}
     </div>
     <div class="panel-body clearfix">
         <a class="" title="{{{shortname}}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}">
@@ -91,6 +83,16 @@
                         <span class="course-type-label">{{coursetype}}</span>
                     </span>
                 {{/hascoursetype}}
+            </div>
+            <div class="course-rating-center">
+                {{#hasrating}}
+                    {{#rating}}
+                    <div class="vitrina-ranking-stars" style="transform-origin: center;" title="{{title}}">
+                        <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
+                        {{#pix}}stars_empty, block_vitrina{{/pix}}
+                    </div>
+                    {{/rating}}
+                {{/hasrating}}
             </div>
             <div class="course-enrolled-right">
                 {{#enrolled}}

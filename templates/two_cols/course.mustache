@@ -79,20 +79,21 @@
                     </span>
                 {{/hascoursetype}}
             </div>
+            <div class="course-rating-center">
+                {{#hasrating}}
+                    {{#rating}}
+                    <div class="vitrina-ranking-stars" title="{{title}}">
+                        <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
+                    </div>
+                    {{/rating}}
+                {{/hasrating}}
+            </div>
             <div class="course-enrolled-right">
                 {{#enrolled}}
                     <span class="course-enrolled-label">{{#str}} enrolledshort, block_vitrina {{/str}}</span>
                 {{/enrolled}}
             </div>
         </div>
-        {{#hasrating}}
-            {{#rating}}
-            <div class="vitrina-ranking-stars">
-                <div class="vitrina-ranking-stars-bar" style="width: {{percent}}%;"></div>
-                {{#pix}}stars_empty, block_vitrina{{/pix}}
-            </div>
-            {{/rating}}
-        {{/hasrating}}
     </div>
     {{^active}}
         <div class="waiting-label">{{#str}}waiting, block_vitrina{{/str}}</div>

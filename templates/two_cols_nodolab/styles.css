@@ -89,13 +89,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px 0;
     font-size: 90%;
 }
 
 .block_vitrina-courseslist .coursebox .course-type-left {
     display: flex;
     align-items: center;
+}
+
+.block_vitrina-courseslist .coursebox .course-rating-center {
+	display: flex;
+	justify-content: center;
+}
+
+.block_vitrina-courseslist .coursebox .course-rating-center .vitrina-ranking-stars {
+	margin-left: 0;
 }
 
 .block_vitrina-courseslist .coursebox .course-type-label {
@@ -324,9 +332,14 @@ html:has(body#page-blocks-vitrina-detail) {
     scroll-behavior: smooth;
 }
 
+.coursebox .vitrina-ranking-stars
+{
+    transform-origin: center;
+}
+
 #page-blocks-vitrina-detail .course-detail .vitrina-ranking-stars, .vitrina-ranking-stars {
-    --stars-width: 159px;
-    --stars-height: 35px;
+    --stars-width: 118px;
+    --stars-height: 26px;
     width: var(--stars-width);
     height: var(--stars-height);
     margin-left: 20px;
