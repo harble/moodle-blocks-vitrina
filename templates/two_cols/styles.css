@@ -47,7 +47,7 @@
     background-color: #000;
     color: #fff;
     border-radius: 5px;
-    margin: -40px auto 20px;
+    margin: -40px auto 20px !important;
     display: block;
     max-width: 95%;
     padding: 10px;
@@ -60,6 +60,7 @@
 .block_vitrina-courseslist .coursebox .panel-foot {
     padding-bottom: 0;
     border-top: 1px solid #e7e7e7;
+    margin-bottom: 5px !important;
 }
 
 .block_vitrina-courseslist .coursebox .panel-foot .btn {
