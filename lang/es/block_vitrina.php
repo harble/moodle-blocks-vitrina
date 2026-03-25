@@ -116,6 +116,7 @@ $string['ratingmanager'] = 'Manejador de la valoración';
 $string['ratingmanager_help'] = 'Elija el complemento para usar en la valoración de cursos.';
 $string['ratings'] = 'Valoraciones';
 $string['ratingslabel'] = '{$a} calificaciones';
+$string['rating_detail_title'] = '{$a->count} valoraciones, Promedio {$a->avg}';
 $string['recents'] = 'Nuevos';
 $string['relatedcourses'] = "Cursos relacionados";
 $string['relatedlimit'] = 'Límite de cursos relacionados';

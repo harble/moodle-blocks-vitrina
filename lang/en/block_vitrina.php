@@ -123,6 +123,7 @@ $string['ratingmanager'] = 'Rating manager';
 $string['ratingmanager_help'] = 'Choose the plugin to use in the rating course.';
 $string['ratings'] = 'Ratings';
 $string['ratingslabel'] = '{$a} ratings';
+$string['rating_detail_title'] = '{$a->count} ratings, Average {$a->avg}';
 $string['recents'] = 'Recent items';
 $string['relatedcourses'] = 'Related courses';
 $string['relatedlimit'] = 'Related courses limit';

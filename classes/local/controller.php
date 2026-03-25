@@ -275,6 +275,10 @@ class controller {
                 $course->rating->percent = round($course->rating->total * 20);
                 $course->rating->formated = str_pad($course->rating->total, 3, '.0');
                 $course->rating->stars = $course->rating->total > 0 ? range(1, $course->rating->total) : null;
+                $course->rating->title = get_string('rating_detail_title', 'block_vitrina', (object) [
+                    'avg' => $course->rating->formated,
+                    'count' => $course->rating->count,
+                ]);
                 $course->hasrating = $course->rating->count > 0;
             }
         }
