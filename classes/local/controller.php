@@ -529,7 +529,12 @@ class controller {
         }
 
         if ($label === '') {
-            $course->hascoursetype = false;
+            // Field is configured but this course has no explicit value.
+            // Still expose a generic course-type icon with an empty label
+            // so that templates can always render the icon.
+            $course->hascoursetype = true;
+            $course->coursetype = '';
+            $course->coursetypeiconhtml = self::get_coursetype_icon_html('');
             return;
         }
 
