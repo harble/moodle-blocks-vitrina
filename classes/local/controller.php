@@ -528,28 +528,42 @@ class controller {
             }
         }
 
+        // Build a localised title based on the course category, if available.
+        $categorytitle = '';
+        try {
+            $category = \core_course_category::get($course->category, IGNORE_MISSING, true);
+            if ($category) {
+                $catname = $category->get_formatted_name();
+                $categorytitle = get_string('coursetype_category_title', 'block_vitrina', $catname);
+            }
+        } catch (\moodle_exception $e) {
+            // Ignore and leave $categorytitle empty.
+        }
+
         if ($label === '') {
             // Field is configured but this course has no explicit value.
             // Still expose a generic course-type icon with an empty label
-            // so that templates can always render the icon.
+            // so that templates can always render the icon, but with the
+            // course category shown in the title on hover.
             $course->hascoursetype = true;
             $course->coursetype = '';
-            $course->coursetypeiconhtml = self::get_coursetype_icon_html('');
+            $course->coursetypeiconhtml = self::get_coursetype_icon_html('', $categorytitle);
             return;
         }
 
         $course->hascoursetype = true;
         $course->coursetype = $label;
-        $course->coursetypeiconhtml = self::get_coursetype_icon_html($label);
+        $course->coursetypeiconhtml = self::get_coursetype_icon_html($label, $categorytitle);
     }
 
     /**
      * Get icon HTML for a given course type label.
      *
-     * @param string $label Course type label.
+    * @param string $label Course type label.
+    * @param string|null $title Optional hover title (e.g. course category label).
      * @return string Safe HTML snippet with a Boost/FontAwesome icon.
      */
-    protected static function get_coursetype_icon_html(string $label): string {
+    protected static function get_coursetype_icon_html(string $label, ?string $title = null): string {
         // Normalise label for matching.
         $norm = \core_text::strtolower(trim($label));
 
@@ -570,8 +584,15 @@ class controller {
 
         $icon = preg_replace('/[^a-z0-9\-]/', '', $icon);
 
+        // Optional title for hover, for example: "Course category: XX".
+        $title = $title ?? '';
+        $titleattr = '';
+        if ($title !== '') {
+            $titleattr = ' title="' . s($title) . '"';
+        }
+
         // Use Boost/FontAwesome icon classes.
-        return '<span class="vitrina-course-type-icon"><i class="icon fa fa-' . $icon . ' fa-fw" aria-hidden="true"></i></span>';
+        return '<span class="vitrina-course-type-icon"' . $titleattr . '><i class="icon fa fa-' . $icon . ' fa-fw" aria-hidden="true"></i></span>';
     }
 
     /**
