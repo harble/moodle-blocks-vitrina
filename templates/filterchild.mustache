@@ -42,6 +42,9 @@
                 class="filteroption"
                 {{#selected}}checked{{/selected}}>
         <label for="option-{{key}}_{{value}}" title="{{label}}">{{label}}</label>
+        {{#haschilds}}
+            <span class="tree-toggle icon fa fa-plus-circle" aria-hidden="true"></span>
+        {{/haschilds}}
     </div>
     {{#haschilds}}
         <ul class="filteroptions">

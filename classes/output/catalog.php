@@ -96,7 +96,10 @@ class catalog implements renderable, templatable {
         if (in_array('categories', $staticfilters)) {
             $catfilterview = get_config('block_vitrina', 'catfilterview');
 
-            $nested = $catfilterview == 'tree';
+            // When the admin selects "tree" in the Category filter view
+            // setting, build the category list as a hierarchy; otherwise,
+            // keep the original flat list behaviour.
+            $nested = ($catfilterview == 'tree');
 
             $categoriesoptions = \block_vitrina\local\controller::get_categories([], $nested);
 

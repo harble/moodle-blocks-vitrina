@@ -827,6 +827,34 @@
     display: flex;
 }
 
+.path-blocks-vitrina .filtercontrol .filteroptions .filter-optiongroup.haschilds > .filter-option {
+    align-items: center;
+}
+
+.path-blocks-vitrina .filtercontrol .filteroptions .filter-optiongroup .tree-toggle {
+    width: 1em;
+    height: 1em;
+    margin-left: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.path-blocks-vitrina .filtercontrol .filteroptions .filter-optiongroup.haschilds > ul.filteroptions {
+    display: none;
+    margin-left: 18px;
+}
+
+.path-blocks-vitrina .filtercontrol .filteroptions .filter-optiongroup.haschilds.expanded > ul.filteroptions {
+    display: block;
+}
+
+.path-blocks-vitrina .filtercontrol .filteroptions .filter-optiongroup.haschilds > .filter-option label {
+    flex: 1 1 auto;
+    width: auto;
+}
+
 .vitrina-filter-closebutton,
 .vitrina-filter-responsivebutton {
     display: none;

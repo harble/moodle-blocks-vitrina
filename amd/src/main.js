@@ -441,4 +441,52 @@ export const filters = (uniqueid, selectedfilters = []) => {
         $filtersbox.removeClass('opened-popup');
     });
 
+    // Initialize the category filter as a collapsible tree when there are
+    // parent categories with children.
+    var $categoryControl = $filtersbox.find('.filtercontrol[data-key="categories"]');
+    if ($categoryControl.length) {
+
+        var updateTreeExpansion = function() {
+            $categoryControl.find('.filter-optiongroup.haschilds').each(function() {
+                var $group = $(this);
+
+                var hasSelectedDescendant = $group.find('ul.filteroptions input.filteroption:checked').length > 0;
+                var isSelectedSelf = $group.find('> .filter-option > input.filteroption:checked').length > 0;
+                var $icon = $group.find('> .filter-option .tree-toggle');
+
+                if (hasSelectedDescendant || isSelectedSelf) {
+                    $group.addClass('expanded');
+                    $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+                } else {
+                    $group.removeClass('expanded');
+                    $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                }
+            });
+        };
+
+        // Initial expansion based on any preselected categories.
+        updateTreeExpansion();
+
+        // Toggle expand/collapse when clicking on the parent icon.
+        $categoryControl.on('click', '.tree-toggle', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $group = $(this).closest('.filter-optiongroup.haschilds');
+            $group.toggleClass('expanded');
+
+            var $icon = $group.find('> .filter-option .tree-toggle');
+            if ($group.hasClass('expanded')) {
+                $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+            } else {
+                $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+            }
+        });
+
+        // Keep expansion state in sync with checkbox changes.
+        $categoryControl.on('change', 'input.filteroption', function() {
+            updateTreeExpansion();
+        });
+    }
+
 };
