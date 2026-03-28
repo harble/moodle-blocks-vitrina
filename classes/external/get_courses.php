@@ -125,9 +125,11 @@ class get_courses extends external_api {
 
         // Read the categories if is a block instance call or the filter by categories is defined.
         $categoriesids = [];
+        $categoriesfilterexplicit = false;
 
         foreach ($params['filters'] as $filter) {
             if ($filter['type'] == 'categories') {
+                $categoriesfilterexplicit = true;
                 $categoriesids = $filter['values'];
 
                 // Remove filter.
@@ -150,6 +152,13 @@ class get_courses extends external_api {
 
         $sort = $params['sort'];
         $sortdirection = $params['sortdirection'];
+
+        // If the user explicitly cleared all categories (we received an empty
+        // categories filter), return no courses instead of falling back to the
+        // block default categories.
+        if ($categoriesfilterexplicit && count($categoriesids) == 0) {
+            return [];
+        }
 
         if (count($categoriesids) == 0) {
             if (!empty($params['instanceid'])) {

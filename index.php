@@ -100,6 +100,51 @@ if (count($categoriesids) > 0) {
     $filtersselected[] = (object) ['key' => 'categories', 'values' => $categoriesids];
 }
 
+// If no category filter has been defined (neither via URL filters nor block
+// instance configuration), but the catalog is configured to show a category
+// filter, preselect all available categories so that the UI state matches the
+// "search in all categories" behaviour.
+$hascategoriesfilter = false;
+foreach ($filtersselected as $selected) {
+    if ($selected->key === 'categories') {
+        $hascategoriesfilter = true;
+        break;
+    }
+}
+
+if (!$hascategoriesfilter) {
+    $staticfilters = get_config('block_vitrina', 'staticfilters');
+    $staticfilters = $staticfilters ? explode(',', $staticfilters) : [];
+
+    if (in_array('categories', $staticfilters)) {
+        $catfilterview = get_config('block_vitrina', 'catfilterview');
+        $nested = $catfilterview == 'tree';
+
+        $categoriesoptions = \block_vitrina\local\controller::get_categories([], $nested);
+        $allcatids = [];
+
+        $collect = function(array $options) use (&$allcatids, &$collect) {
+            foreach ($options as $opt) {
+                if (!empty($opt->value)) {
+                    $allcatids[] = (string)$opt->value;
+                }
+                if (!empty($opt->childs) && is_array($opt->childs)) {
+                    $collect($opt->childs);
+                }
+            }
+        };
+
+        if (!empty($categoriesoptions)) {
+            $collect($categoriesoptions);
+        }
+
+        if (!empty($allcatids)) {
+            $allcatids = array_values(array_unique($allcatids));
+            $filtersselected[] = (object) ['key' => 'categories', 'values' => $allcatids];
+        }
+    }
+}
+
 $PAGE->requires->js_call_amd('block_vitrina/main', 'filters', [$uniqueid, $filtersselected]);
 $PAGE->requires->js_call_amd('block_vitrina/main', 'catalog', [$uniqueid, $view, $instanceid, $bypage]);
 
