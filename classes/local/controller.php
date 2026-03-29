@@ -540,6 +540,22 @@ class controller {
             // Ignore and leave $categorytitle empty.
         }
 
+        // Append course tags information (if any) below the category line in
+        // the hover title. Multiple tags are separated by " | ".
+        $tagstitle = '';
+        if (\core_tag_tag::is_enabled('core', 'course')) {
+            $tags = \core_tag_tag::get_item_tags_array('core', 'course', $course->id);
+            if (!empty($tags)) {
+                $tagnames = array_values($tags);
+                $tagstitle = get_string('coursetype_tags_title', 'block_vitrina', implode(' | ', $tagnames));
+            }
+        }
+
+        $fulltitle = $categorytitle;
+        if ($tagstitle !== '') {
+            $fulltitle = $fulltitle !== '' ? ($fulltitle . "\n" . $tagstitle) : $tagstitle;
+        }
+
         if ($label === '') {
             // Field is configured but this course has no explicit value.
             // Still expose a generic course-type icon with an empty label
@@ -547,13 +563,13 @@ class controller {
             // course category shown in the title on hover.
             $course->hascoursetype = true;
             $course->coursetype = '';
-            $course->coursetypeiconhtml = self::get_coursetype_icon_html('', $categorytitle);
+            $course->coursetypeiconhtml = self::get_coursetype_icon_html('', $fulltitle);
             return;
         }
 
         $course->hascoursetype = true;
         $course->coursetype = $label;
-        $course->coursetypeiconhtml = self::get_coursetype_icon_html($label, $categorytitle);
+        $course->coursetypeiconhtml = self::get_coursetype_icon_html($label, $fulltitle);
     }
 
     /**

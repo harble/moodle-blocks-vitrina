@@ -175,6 +175,7 @@ $string['tokenenroll'] = 'Inscribirse con token';
 $string['viewall'] = 'Ver todos';
 $string['viewsicons'] = 'Iconos para vistas';
 $string['coursetype_category_title'] = 'Categoría del curso: {$a}';
+$string['coursetype_tags_title'] = 'Etiquetas del curso: {$a}';
 $string['viewsicons_help'] = 'Elige los íconos que se mostrarán según la vista, normalmente para el menú de pestañas. Uno por línea, con la siguiente estructura: nombrevista=typo/icono. Por ejemplo: greats=i/star. Si no se especifica alguno, se usará el por defecto. Las vistas disponibles son: default, recents, greats, premium.';
 $string['vitrina:addinstance'] = 'Adicionar un nuevo bloque de Vitrina de cursos';
 $string['vitrina:myaddinstance'] = 'Adicionar un nuevo bloque de Vitrina de cursos a Dashboard';
