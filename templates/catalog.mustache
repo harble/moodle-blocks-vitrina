@@ -70,6 +70,18 @@
                     </div>
                 {{/fulltext}}
 
+                {{#hastags}}
+                    <div class="filtertags" style="margin-bottom:12px;">
+                        <label for="vitrina-tags-{{uniqueid}}">{{#str}}coursetagsfilter, block_vitrina{{/str}}</label>
+                        <select id="vitrina-tags-{{uniqueid}}" name="tagsfilter" class="form-control">
+                            <option value=""> </option>
+                            {{#tagsoptions}}
+                                <option value="{{value}}">{{label}}</option>
+                            {{/tagsoptions}}
+                        </select>
+                    </div>
+                {{/hastags}}
+
                 <div class="filtersortgroup">
                     <label for="vitrina-sortby-{{uniqueid}}">{{#str}}sortlabel, block_vitrina{{/str}}</label>
                     <div class="row">

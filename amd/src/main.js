@@ -150,6 +150,19 @@ function loadCourses(uniqueid, $tabcontent) {
                 });
             }
         });
+
+        // Tags dropdown filter (single-select). If a tag is selected, add a
+        // "tags" filter for the backend.
+        var $tagselect = $filtersbox.find('select[name="tagsfilter"]');
+        if ($tagselect.length > 0) {
+            var tagvalue = $tagselect.val();
+            if (tagvalue) {
+                filters.push({
+                    'values': [tagvalue],
+                    'type': 'tags'
+                });
+            }
+        }
     }
     // End of check active filters.
 
@@ -425,6 +438,7 @@ export const filters = (uniqueid, selectedfilters = []) => {
     $filtersbox.find('.filtercontrol .filteroptions input').on('change', applyFilters);
     $filtersbox.find('.filtersort select[name="sort"]').on('change', applyFilters);
     $filtersbox.find('.filtersortdirection select[name="sortdirection"]').on('change', applyFilters);
+    $filtersbox.find('select[name="tagsfilter"]').on('change', applyFilters);
 
     $filtersbox.find('.filterfulltext button').on('click', applyFilters);
     $filtersbox.find('.filterfulltext input').on('keypress', function(e) {
