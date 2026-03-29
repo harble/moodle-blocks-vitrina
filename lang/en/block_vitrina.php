@@ -31,6 +31,8 @@ $string['catfilterview'] = 'Category filter view';
 $string['catfilterview_default'] = 'By default';
 $string['catfilterview_help'] = 'Choose the view to display the categories filter.';
 $string['catfilterview_tree'] = 'Tree';
+$string['coursetagsfilter'] = 'Filter by tags';
+$string['coursetagsfilter_help'] = 'Select one or more tags. Only courses having at least one of these tags will be displayed in this block.';
 $string['comment_by'] = 'By {$a}';
 $string['commentslabel'] = '{$a} comments';
 $string['commentsmanager'] = 'Comments manager';
@@ -131,6 +133,7 @@ $string['relatedlimit_help'] = 'The number of related courses to display in the 
 $string['requireauth'] = 'You need <a href="{$a}">login</a> in order to enroll this course';
 $string['returntocatalog'] = 'Go to Catalog';
 $string['selectcategories'] = 'Choose a course category';
+$string['selecttags'] = 'Choose course tags';
 $string['settingsheaderappearance'] = 'Appearance';
 $string['settingsheaderfields'] = 'Course fields';
 $string['settingsheaderfiltering'] = 'Filtering';

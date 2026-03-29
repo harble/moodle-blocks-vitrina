@@ -31,6 +31,8 @@ $string['catfilterview'] = 'Vista de filtro de categorías';
 $string['catfilterview_default'] = 'Por defecto';
 $string['catfilterview_help'] = 'Seleccione la vista como se mostrará el filtro de categorías.';
 $string['catfilterview_tree'] = 'Árbol';
+$string['coursetagsfilter'] = 'Filtrar por etiquetas';
+$string['coursetagsfilter_help'] = 'Seleccione una o más etiquetas. Solo se mostrarán en este bloque los cursos que tengan al menos una de estas etiquetas.';
 $string['comment_by'] = 'Por {$a}';
 $string['commentslabel'] = '{$a} comentarios';
 $string['commentsmanager'] = 'Manejador de comentarios';
@@ -124,6 +126,7 @@ $string['relatedlimit_help'] = 'Número de cursos relacionados a mostrar en la v
 $string['requireauth'] = 'Debe <a href="{$a}">acceder</a> primero para poder matricular este curso';
 $string['returntocatalog'] = 'Ir al catálogo de cursos';
 $string['selectcategories'] = 'Elija una categoría de curso';
+$string['selecttags'] = 'Elija etiquetas de curso';
 $string['settingsheaderappearance'] = 'Apariencia';
 $string['settingsheaderfields'] = 'Campos del curso';
 $string['settingsheaderfiltering'] = 'Filtros';

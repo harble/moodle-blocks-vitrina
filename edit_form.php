@@ -90,6 +90,36 @@ class block_vitrina_edit_form extends block_edit_form {
             $options
         );
 
+        // Select course tags to filter by.
+        $tagoptions = [];
+        $tagrecords = $DB->get_records_sql(
+            "SELECT DISTINCT t.id, t.name
+               FROM {tag} t
+               JOIN {tag_instance} ti ON ti.tagid = t.id
+              WHERE ti.component = 'core' AND ti.itemtype = 'course'
+           ORDER BY t.name ASC"
+        );
+
+        foreach ($tagrecords as $tagrecord) {
+            $tagoptions[$tagrecord->id] = $tagrecord->name;
+        }
+
+        if (!empty($tagoptions)) {
+            $tagselectoptions = [
+                'multiple' => true,
+                'noselectionstring' => get_string('selecttags', 'block_vitrina'),
+            ];
+
+            $mform->addElement(
+                'autocomplete',
+                'config_tags',
+                get_string('coursetagsfilter', 'block_vitrina'),
+                $tagoptions,
+                $tagselectoptions
+            );
+            $mform->addHelpButton('config_tags', 'coursetagsfilter', 'block_vitrina');
+        }
+
         // ------- NEW ADDED
         // Sort by default.
         $sortOptions = [

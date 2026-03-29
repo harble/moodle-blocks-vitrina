@@ -160,11 +160,11 @@ class get_courses extends external_api {
             return [];
         }
 
-        if (count($categoriesids) == 0) {
+        if (count($categoriesids) == 0 || !empty($params['instanceid'])) {
             if (!empty($params['instanceid'])) {
                 $block = block_instance_by_id($params['instanceid']);
 
-                if ($block->config && count($block->config->categories) > 0) {
+                if ($block->config && count($categoriesids) == 0 && !empty($block->config->categories)) {
                     $categoriesids = $block->config->categories;
                 }
 
@@ -175,9 +175,27 @@ class get_courses extends external_api {
                 if ($block->config && !empty($block->config->sortdirection) && empty($sortdirection)) {
                     $sortdirection = $block->config->sortdirection;
                 }
+
+                // If no explicit tags filter was passed, apply instance configured tags as a filter.
+                if (!empty($block->config->tags)) {
+                    $hastagfilter = false;
+                    foreach ($params['filters'] as $filter) {
+                        if (!empty($filter['type']) && $filter['type'] === 'tags') {
+                            $hastagfilter = true;
+                            break;
+                        }
+                    }
+
+                    if (!$hastagfilter) {
+                        $params['filters'][] = [
+                            'type' => 'tags',
+                            'values' => is_array($block->config->tags) ? $block->config->tags : [$block->config->tags],
+                        ];
+                    }
+                }
             }
         }
-        // End of read categories.
+        // End of read categories and instance configuration.
 
         $courses = \block_vitrina\local\controller::get_courses_by_view(
             $params['view'],

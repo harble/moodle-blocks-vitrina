@@ -935,6 +935,20 @@ class controller {
                     }
 
                     break;
+                case 'tags':
+                    // Filter courses by matching course tags.
+                    $tagids = array_map('intval', $filter['values']);
+                    $tagids = array_filter($tagids);
+
+                    if (count($tagids) > 0 && \core_tag_tag::is_enabled('core', 'course')) {
+                        [$selectintags, $paramsintags] = $DB->get_in_or_equal($tagids, SQL_PARAMS_NAMED, 'tagid');
+                        $params = array_merge($params, $paramsintags);
+
+                        $joincustomfields .= " INNER JOIN {tag_instance} ti ON ti.component = 'core' " .
+                            "AND ti.itemtype = 'course' AND ti.itemid = c.id AND ti.tagid " . $selectintags;
+                    }
+
+                    break;
                 case 'langs':
                     $langs = $filter['values'];
                     $defaultlang = $CFG->lang;
