@@ -144,13 +144,16 @@ class catalog implements renderable, templatable {
                 $filtercontrols[] = $control;
             }
         } else {
-            // No block-level tags configuration: expose all course tags as a
-            // simple dropdown.
+            // No block-level tags configuration: expose all course tags and
+            // standard tags as a simple dropdown, using a single query.
+
             $tagrecords = $DB->get_records_sql(
                 "SELECT DISTINCT t.id, t.name
                    FROM {tag} t
-                   JOIN {tag_instance} ti ON ti.tagid = t.id
-                  WHERE ti.component = 'core' AND ti.itemtype = 'course'
+              LEFT JOIN {tag_instance} ti ON ti.tagid = t.id
+                     AND ti.component = 'core'
+                     AND ti.itemtype = 'course'
+                  WHERE t.isstandard = 1 OR ti.id IS NOT NULL
                ORDER BY t.name ASC"
             );
 

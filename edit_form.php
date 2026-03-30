@@ -90,13 +90,17 @@ class block_vitrina_edit_form extends block_edit_form {
             $options
         );
 
-        // Select course tags to filter by.
+        // Select course tags and standard tags to filter by, in a single
+        // query: any tag that is standard OR already used on a course.
         $tagoptions = [];
+
         $tagrecords = $DB->get_records_sql(
             "SELECT DISTINCT t.id, t.name
                FROM {tag} t
-               JOIN {tag_instance} ti ON ti.tagid = t.id
-              WHERE ti.component = 'core' AND ti.itemtype = 'course'
+          LEFT JOIN {tag_instance} ti ON ti.tagid = t.id
+                 AND ti.component = 'core'
+                 AND ti.itemtype = 'course'
+              WHERE t.isstandard = 1 OR ti.id IS NOT NULL
            ORDER BY t.name ASC"
         );
 
