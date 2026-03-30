@@ -133,7 +133,7 @@ $string['relatedlimit_help'] = 'The number of related courses to display in the 
 $string['requireauth'] = 'You need <a href="{$a}">login</a> in order to enroll this course';
 $string['returntocatalog'] = 'Go to Catalog';
 $string['selectcategories'] = 'Choose a course category';
-$string['selecttags'] = 'Choose course tags';
+$string['selecttags'] = 'No limit';
 $string['settingsheaderappearance'] = 'Appearance';
 $string['settingsheaderfields'] = 'Course fields';
 $string['settingsheaderfiltering'] = 'Filtering';

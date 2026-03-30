@@ -126,7 +126,7 @@ $string['relatedlimit_help'] = 'Número de cursos relacionados a mostrar en la v
 $string['requireauth'] = 'Debe <a href="{$a}">acceder</a> primero para poder matricular este curso';
 $string['returntocatalog'] = 'Ir al catálogo de cursos';
 $string['selectcategories'] = 'Elija una categoría de curso';
-$string['selecttags'] = 'Elija etiquetas de curso';
+$string['selecttags'] = 'Sin límite';
 $string['settingsheaderappearance'] = 'Apariencia';
 $string['settingsheaderfields'] = 'Campos del curso';
 $string['settingsheaderfiltering'] = 'Filtros';

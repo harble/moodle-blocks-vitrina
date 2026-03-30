@@ -74,7 +74,7 @@
                     <div class="filtertags" style="margin-bottom:12px;">
                         <label for="vitrina-tags-{{uniqueid}}">{{#str}}coursetagsfilter, block_vitrina{{/str}}</label>
                         <select id="vitrina-tags-{{uniqueid}}" name="tagsfilter" class="form-control">
-                            <option value=""> </option>
+                            <option value="">{{#str}}selecttags, block_vitrina{{/str}}</option>
                             {{#tagsoptions}}
                                 <option value="{{value}}">{{label}}</option>
                             {{/tagsoptions}}
