@@ -148,6 +148,17 @@ function loadCourses(uniqueid, $tabcontent) {
                     'values': [],
                     'type': key
                 });
+            } else if (key === 'tags') {
+                // When the block instance has configured course tags, they
+                // are shown as a checkbox list (key = "tags"). If the user
+                // unchecks all of them, send an explicit empty "tags"
+                // filter so that the backend knows tag-based filtering has
+                // been cleared and does NOT fall back to the block's
+                // default configured tags.
+                filters.push({
+                    'values': [],
+                    'type': key
+                });
             }
         });
 
