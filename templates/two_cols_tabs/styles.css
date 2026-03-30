@@ -627,11 +627,12 @@ html:has(body#page-blocks-vitrina-detail) {
 }
 
 .path-blocks-vitrina .filtercontrol > h5 {
-    background-color: transparent;
+    background-color: #dddddd;
     color: var(--primary);
     text-align: left;
     border: none;
-    margin-top: 40px;
+    margin-top: 4px;
+    text-align: center;
 }
 
 #page-blocks-vitrina-detail #page-header h1.h2 {
