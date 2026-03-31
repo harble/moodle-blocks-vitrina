@@ -177,7 +177,13 @@ class catalog implements renderable, templatable {
 
             $categoriesoptions = \block_vitrina\local\controller::get_categories([], $nested);
 
-            if (count($categoriesoptions) > 1) {
+            // Show the category filter as long as there is at least one
+            // available category. Previously this was limited to more
+            // than one category (>1), which meant that when the global
+            // plugin configuration restricted the catalog to a single
+            // category, the catalog page appeared without any category
+            // list at all.
+            if (count($categoriesoptions) > 0) {
                 $control = new \stdClass();
                 $control->title = get_string('category');
                 $control->key = 'categories';

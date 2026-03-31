@@ -1240,23 +1240,16 @@ class controller {
     public static function get_categories(array $selectedlist = [], bool $nested = false): array {
         global $DB;
 
+        // Always return the full list of visible categories; do not
+        // restrict by the global plugin configuration here. The
+        // selection of which categories are checked by default in the
+        // catalog is handled separately (instance config first,
+        // then global config, then all), while this method is
+        // responsible only for providing the complete tree/list to
+        // render.
+
         $select = 'visible = 1';
         $params = [];
-
-        $categoriesids = [];
-        $categories = get_config('block_vitrina', 'categories');
-        $catslist = explode(',', $categories);
-        foreach ($catslist as $catid) {
-            if (is_numeric($catid)) {
-                $categoriesids[] = (int) trim($catid);
-            }
-        }
-
-        if (count($categoriesids) > 0) {
-            [$selectincats, $paramsincats] = $DB->get_in_or_equal($categoriesids, SQL_PARAMS_NAMED, 'categories');
-            $params += $paramsincats;
-            $select .= ' AND id ' . $selectincats;
-        }
 
         $categories = $DB->get_records_select('course_categories', $select, $params, 'sortorder ASC');
 

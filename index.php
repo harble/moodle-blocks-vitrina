@@ -120,6 +120,8 @@ if (!$hascategoriesfilter) {
         $catfilterview = get_config('block_vitrina', 'catfilterview');
         $nested = $catfilterview == 'tree';
 
+        // Build the list of all available categories for the filter
+        // control (always full list, independent of global config).
         $categoriesoptions = \block_vitrina\local\controller::get_categories([], $nested);
         $allcatids = [];
 
@@ -139,8 +141,47 @@ if (!$hascategoriesfilter) {
         }
 
         if (!empty($allcatids)) {
-            $allcatids = array_values(array_unique($allcatids));
-            $filtersselected[] = (object) ['key' => 'categories', 'values' => $allcatids];
+            // Determine which categories should be selected by default
+            // when there is no explicit categories filter:
+            //   1) If a block instance is specified and has configured
+            //      categories, use those.
+            //   2) Otherwise, if the global plugin configuration has
+            //      categories, use those.
+            //   3) If neither is configured, select all categories.
+
+            $defaultids = [];
+
+            // 1) Block instance configuration (already loaded earlier
+            // into $categoriesids when $instanceid is present).
+            if (!empty($categoriesids)) {
+                $defaultids = array_map('strval', $categoriesids);
+            } else {
+                // 2) Global plugin configuration.
+                $globalcategories = get_config('block_vitrina', 'categories');
+                $globalids = [];
+                if (!empty($globalcategories)) {
+                    $catslist = explode(',', $globalcategories);
+                    foreach ($catslist as $catid) {
+                        $catid = trim($catid);
+                        if ($catid !== '' && is_numeric($catid)) {
+                            $globalids[] = (string)((int)$catid);
+                        }
+                    }
+                }
+
+                if (!empty($globalids)) {
+                    $defaultids = $globalids;
+                }
+            }
+
+            // 3) No block or global configuration: all categories.
+            if (empty($defaultids)) {
+                $defaultids = array_values(array_unique($allcatids));
+            }
+
+            if (!empty($defaultids)) {
+                $filtersselected[] = (object) ['key' => 'categories', 'values' => $defaultids];
+            }
         }
     }
 }
