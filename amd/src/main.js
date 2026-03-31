@@ -1,3 +1,4 @@
+/* eslint linebreak-style: 0 */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -39,6 +40,12 @@ var bypage = [];
 
 // Paging variable controls.
 var paging = [];
+
+// Fixed filters per block instance (keyed by uniqueid).
+// Used mainly for block instances that must always apply
+// some filters (for example, a fixed course category) even
+// when there is no visible filters UI.
+var fixedfilters = [];
 
 // Filters box.
 var $filtersbox = null;
@@ -176,6 +183,20 @@ function loadCourses(uniqueid, $tabcontent) {
         }
     }
     // End of check active filters.
+
+    // Apply any fixed filters configured for this block instance
+    // (for example, a fixed categories filter when the block is
+    // configured to split by category into multiple sections).
+    if (fixedfilters[uniqueid]) {
+        fixedfilters[uniqueid].forEach(function(fixed) {
+            // Remove existing filters of the same type so the
+            // fixed filter takes precedence.
+            filters = filters.filter(function(current) {
+                return current.type !== fixed.type;
+            });
+            filters.push(fixed);
+        });
+    }
 
     var sort = '';
     var sortdirection = '';
@@ -400,11 +421,17 @@ export const detail = () => {
  * @param {string} view
  * @param {integer} currentinstanceid
  * @param {integer} currentbypage
+ * @param {array} fixedfiltersArg Optional fixed filters to apply in all
+ *        requests for this block instance (e.g. categories).
  */
-export const catalog = (uniqueid, view, currentinstanceid = 0, currentbypage = 20) => {
+export const catalog = (uniqueid, view, currentinstanceid = 0, currentbypage = 20, fixedfiltersArg = null) => {
 
     instanceid[uniqueid] = currentinstanceid;
     bypage[uniqueid] = parseInt(currentbypage);
+
+    if (fixedfiltersArg) {
+        fixedfilters[uniqueid] = fixedfiltersArg;
+    }
     var $tabcontent = $('#' + uniqueid + ' .tabs-content .tab-' + view);
 
     loadCourses(uniqueid, $tabcontent);

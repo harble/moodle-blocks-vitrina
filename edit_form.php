@@ -90,6 +90,21 @@ class block_vitrina_edit_form extends block_edit_form {
             $options
         );
 
+        // Split block content by selected course categories in the block
+        // view, rendering one independent section per category. The
+        // catalog page remains as a single unified list.
+        $splitoptions = [
+            '0' => get_string('no'),
+            '1' => get_string('yes'),
+        ];
+        $mform->addElement(
+            'select',
+            'config_splitbycategories',
+            get_string('splitbycategories', 'block_vitrina'),
+            $splitoptions
+        );
+        $mform->addHelpButton('config_splitbycategories', 'splitbycategories', 'block_vitrina');
+
         // Select course tags and standard tags to filter by, in a single
         // query: any tag that is standard OR already used on a course.
         $tagoptions = [];

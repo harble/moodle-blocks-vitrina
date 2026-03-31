@@ -183,17 +183,72 @@ class block_vitrina extends block_base {
         // Memory footprint.
         unset($filteropt);
 
-        $uniqueid = \block_vitrina\local\controller::get_uniqueid();
-
         // Load templates to display courses.
-        $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs);
         $renderer = $this->page->get_renderer('block_vitrina');
-        $html .= $renderer->render($renderable);
+
+        // When the block instance is configured to split by categories and
+        // more than one category has been selected, render one independent
+        // sub-block per category. Each sub-block behaves like its own
+        // block_vitrina instance: it has its own tabs, paging state and
+        // load more button, and it is stacked vertically in the block
+        // content area. The catalog page continues to use the unified
+        // (non-split) behaviour.
+        $splitbycategories = !empty($this->config->splitbycategories);
+        $instancecategories = [];
+
+        if (!empty($this->config->categories) && is_array($this->config->categories)) {
+            $instancecategories = $this->config->categories;
+        }
+
+        if ($splitbycategories && count($instancecategories) > 1) {
+            foreach ($instancecategories as $categoryid) {
+                $uniqueid = \block_vitrina\local\controller::get_uniqueid();
+
+                // Optional category title before each sub-block.
+                if (!empty($categoryid)) {
+                    $category = \core_course_category::get($categoryid, IGNORE_MISSING);
+                    if ($category) {
+                        $categoryname = $category->get_formatted_name();
+                        $html .= \html_writer::tag('h3', $categoryname, ['class' => 'block_vitrina-categorytitle']);
+                    }
+                }
+
+                $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs);
+                $html .= $renderer->render($renderable);
+
+                // Pass a fixed categories filter for this sub-block so that
+                // each section shows only its own category while the
+                // catalog view remains unchanged.
+                $fixedfilters = [
+                    [
+                        'type' => 'categories',
+                        'values' => [(int)$categoryid],
+                    ],
+                ];
+
+                $this->page->requires->js_call_amd(
+                    'block_vitrina/main',
+                    'catalog',
+                    [$uniqueid, $tabs[0], $this->instance->id, $amount, $fixedfilters]
+                );
+            }
+        } else {
+            // Default behaviour: single unified block using all configured
+            // categories for this instance.
+            $uniqueid = \block_vitrina\local\controller::get_uniqueid();
+            $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs);
+            $html .= $renderer->render($renderable);
+
+            $this->page->requires->js_call_amd(
+                'block_vitrina/main',
+                'catalog',
+                [$uniqueid, $tabs[0], $this->instance->id, $amount]
+            );
+        }
 
         $this->content->text = $html;
 
         \block_vitrina\local\controller::include_templatecss($this->instance->id);
-        $this->page->requires->js_call_amd('block_vitrina/main', 'catalog', [$uniqueid, $tabs[0], $this->instance->id, $amount]);
 
         return $this->content;
     }
