@@ -45,6 +45,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: -10px;
+    font-size: medium;
 }
 
 .block_vitrina-courseslist .coursebox .panel-body .coursesummary {
