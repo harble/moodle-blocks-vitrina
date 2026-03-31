@@ -29,6 +29,11 @@ $instanceid = optional_param('id', 0, PARAM_INT);
 $view = optional_param('view', 'default', PARAM_TEXT);
 $filters = optional_param('filters', '', PARAM_TEXT);
 $q = optional_param('q', '', PARAM_TEXT);
+// Optional category id passed explicitly from a split-by-category
+// block instance "view more" link. When present, it takes
+// precedence over instance/global configuration for the initial
+// category selection.
+$categoryidparam = optional_param('categoryid', 0, PARAM_INT);
 
 require_login(null, true);
 
@@ -96,7 +101,13 @@ if (!empty($instanceid)) {
     }
 }
 
-if (count($categoriesids) > 0) {
+// If a category id has been passed explicitly in the URL, use it as
+// the initial categories filter and ignore the instance configuration
+// for this purpose. Otherwise, fall back to the block instance
+// categories configuration.
+if (!empty($categoryidparam)) {
+    $filtersselected[] = (object) ['key' => 'categories', 'values' => [(string)$categoryidparam]];
+} else if (count($categoriesids) > 0) {
     $filtersselected[] = (object) ['key' => 'categories', 'values' => $categoriesids];
 }
 

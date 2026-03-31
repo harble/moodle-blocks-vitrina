@@ -55,18 +55,29 @@ class main implements renderable, templatable {
     private $tabs;
 
     /**
+     * @var int|null Category id used when the block instance is split by
+     *               categories (one sub-block per category). It is used to
+     *               build the "view more" link so the catalog page can
+     *               preselect the corresponding category via URL.
+     */
+    private $categoryid;
+
+    /**
      * Constructor.
      *
      * @param string $uniqueid The uniqueid of the block instance.
      * @param string $view The view type.
      * @param int $instanceid The block instance id.
      * @param array $tabs The tabs configuration.
+     * @param int|null $categoryid Optional category id when rendering a
+     *                             split-by-category sub-block.
      */
-    public function __construct($uniqueid, $view = 'default', int $instanceid = 0, array $tabs = []) {
+    public function __construct($uniqueid, $view = 'default', int $instanceid = 0, array $tabs = [], ?int $categoryid = null) {
         $this->uniqueid = $uniqueid;
         $this->view = $view;
         $this->instanceid = $instanceid;
         $this->tabs = $tabs;
+        $this->categoryid = $categoryid;
     }
 
     /**
@@ -98,6 +109,7 @@ class main implements renderable, templatable {
             'showicon' => \block_vitrina\local\controller::show_tabicon(),
             'showtext' => \block_vitrina\local\controller::show_tabtext(),
             'instanceid' => $this->instanceid,
+            'categoryid' => $this->categoryid,
             // 'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
             'opendetailstarget' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'opendetailstarget'),
         ];

@@ -213,7 +213,7 @@ class block_vitrina extends block_base {
                     }
                 }
 
-                $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs);
+                $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs, (int)$categoryid);
                 $html .= $renderer->render($renderable);
 
                 // Pass a fixed categories filter for this sub-block so that
@@ -236,7 +236,7 @@ class block_vitrina extends block_base {
             // Default behaviour: single unified block using all configured
             // categories for this instance.
             $uniqueid = \block_vitrina\local\controller::get_uniqueid();
-            $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs);
+            $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs, null);
             $html .= $renderer->render($renderable);
 
             $this->page->requires->js_call_amd(
