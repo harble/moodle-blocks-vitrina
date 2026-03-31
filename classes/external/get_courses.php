@@ -195,6 +195,32 @@ class get_courses extends external_api {
                 }
             }
         }
+        // If this is a block instance call and there are still no
+        // categories (no explicit filter and no instance categories),
+        // then fall back to the plugin-level categories configuration
+        // if available; otherwise, do not return any courses.
+        if (!empty($params['instanceid']) && count($categoriesids) == 0) {
+            $globalcategoriesids = [];
+            $categories = get_config('block_vitrina', 'categories');
+
+            if (!empty($categories)) {
+                $catslist = explode(',', $categories);
+                foreach ($catslist as $catid) {
+                    if (is_numeric($catid)) {
+                        $globalcategoriesids[] = (int) trim($catid);
+                    }
+                }
+            }
+
+            if (count($globalcategoriesids) > 0) {
+                $categoriesids = $globalcategoriesids;
+            } else {
+                // Block instance has no categories and the global plugin
+                // configuration also has no categories selected: do not
+                // perform the query and return no courses.
+                return [];
+            }
+        }
         // End of read categories and instance configuration.
 
         $courses = \block_vitrina\local\controller::get_courses_by_view(
