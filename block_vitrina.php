@@ -202,38 +202,79 @@ class block_vitrina extends block_base {
 
         if ($splitbycategories && count($instancecategories) > 1) {
             foreach ($instancecategories as $categoryid) {
+                $categoryid = (int)$categoryid;
+                if (empty($categoryid)) {
+                    continue;
+                }
+
+                // Before rendering the sub-block for this category, check
+                // whether there is at least one course that matches the
+                // current block configuration. If no courses are found,
+                // skip this category so that an empty section is not shown.
+                $previewfilters = [];
+
+                if (!empty($this->config->tags)) {
+                    $previewfilters[] = [
+                        'type' => 'tags',
+                        'values' => is_array($this->config->tags) ? $this->config->tags : [$this->config->tags],
+                    ];
+                }
+
+                $previewsort = '';
+                $previewsortdirection = '';
+
+                if (!empty($this->config->sort)) {
+                    $previewsort = $this->config->sort;
+                }
+
+                if (!empty($this->config->sortdirection)) {
+                    $previewsortdirection = $this->config->sortdirection;
+                }
+
+                $previewcourses = \block_vitrina\local\controller::get_courses_by_view(
+                    $tabs[0],
+                    [$categoryid],
+                    $previewfilters,
+                    $previewsort,
+                    $previewsortdirection,
+                    1,
+                    0
+                );
+
+                if (count($previewcourses) === 0) {
+                    continue;
+                }
+
                 $uniqueid = \block_vitrina\local\controller::get_uniqueid();
 
                 // Optional category title before each sub-block.
-                if (!empty($categoryid)) {
-                    $category = \core_course_category::get($categoryid, IGNORE_MISSING);
-                    if ($category) {
-                        $categoryname = $category->get_formatted_name();
+                $category = \core_course_category::get($categoryid, IGNORE_MISSING);
+                if ($category) {
+                    $categoryname = $category->get_formatted_name();
 
-                        // Build a link to the catalog page for this
-                        // category, matching the "view more" URL for
-                        // this sub-section (same instance id, default
-                        // view and categoryid parameter).
-                        $categoryurl = new \moodle_url('/blocks/vitrina/index.php', [
-                            'view' => $tabs[0],
-                            'id' => $this->instance->id,
-                            'categoryid' => (int)$categoryid,
-                        ]);
+                    // Build a link to the catalog page for this
+                    // category, matching the "view more" URL for
+                    // this sub-section (same instance id, default
+                    // view and categoryid parameter).
+                    $categoryurl = new \moodle_url('/blocks/vitrina/index.php', [
+                        'view' => $tabs[0],
+                        'id' => $this->instance->id,
+                        'categoryid' => $categoryid,
+                    ]);
 
-                        $link = \html_writer::link($categoryurl, $categoryname, [
-                            'class' => 'block_vitrina-categorylink',
-                        ]);
+                    $link = \html_writer::link($categoryurl, $categoryname, [
+                        'class' => 'block_vitrina-categorylink',
+                    ]);
 
-                        // Slightly smaller heading with custom
-                        // vertical spacing.
-                        $html .= \html_writer::tag('h4', $link, [
-                            'class' => 'block_vitrina-categorytitle',
-                            'style' => 'margin-top:12px;margin-bottom:2px;',
-                        ]);
-                    }
+                    // Slightly smaller heading with custom
+                    // vertical spacing.
+                    $html .= \html_writer::tag('h4', $link, [
+                        'class' => 'block_vitrina-categorytitle',
+                        'style' => 'margin-top:12px;margin-bottom:2px;',
+                    ]);
                 }
 
-                $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs, (int)$categoryid);
+                $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs, $categoryid);
                 $html .= $renderer->render($renderable);
 
                 // Pass a fixed categories filter for this sub-block so that
@@ -242,7 +283,7 @@ class block_vitrina extends block_base {
                 $fixedfilters = [
                     [
                         'type' => 'categories',
-                        'values' => [(int)$categoryid],
+                        'values' => [$categoryid],
                     ],
                 ];
 
