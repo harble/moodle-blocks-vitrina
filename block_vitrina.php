@@ -209,7 +209,27 @@ class block_vitrina extends block_base {
                     $category = \core_course_category::get($categoryid, IGNORE_MISSING);
                     if ($category) {
                         $categoryname = $category->get_formatted_name();
-                        $html .= \html_writer::tag('h3', $categoryname, ['class' => 'block_vitrina-categorytitle']);
+
+                        // Build a link to the catalog page for this
+                        // category, matching the "view more" URL for
+                        // this sub-section (same instance id, default
+                        // view and categoryid parameter).
+                        $categoryurl = new \moodle_url('/blocks/vitrina/index.php', [
+                            'view' => $tabs[0],
+                            'id' => $this->instance->id,
+                            'categoryid' => (int)$categoryid,
+                        ]);
+
+                        $link = \html_writer::link($categoryurl, $categoryname, [
+                            'class' => 'block_vitrina-categorylink',
+                        ]);
+
+                        // Slightly smaller heading with custom
+                        // vertical spacing.
+                        $html .= \html_writer::tag('h4', $link, [
+                            'class' => 'block_vitrina-categorytitle',
+                            'style' => 'margin-top:12px;margin-bottom:2px;',
+                        ]);
                     }
                 }
 
