@@ -207,45 +207,15 @@ class block_vitrina extends block_base {
                     continue;
                 }
 
-                // Before rendering the sub-block for this category, check
-                // whether there is at least one course that matches the
-                // current block configuration. If no courses are found,
-                // skip this category so that an empty section is not shown.
-                $previewfilters = [];
-
-                if (!empty($this->config->tags)) {
-                    $previewfilters[] = [
-                        'type' => 'tags',
-                        'values' => is_array($this->config->tags) ? $this->config->tags : [$this->config->tags],
-                    ];
-                }
-
-                $previewsort = '';
-                $previewsortdirection = '';
-
-                if (!empty($this->config->sort)) {
-                    $previewsort = $this->config->sort;
-                }
-
-                if (!empty($this->config->sortdirection)) {
-                    $previewsortdirection = $this->config->sortdirection;
-                }
-
-                $previewcourses = \block_vitrina\local\controller::get_courses_by_view(
-                    $tabs[0],
-                    [$categoryid],
-                    $previewfilters,
-                    $previewsort,
-                    $previewsortdirection,
-                    1,
-                    0
-                );
-
-                if (count($previewcourses) === 0) {
-                    continue;
-                }
-
                 $uniqueid = \block_vitrina\local\controller::get_uniqueid();
+
+                // Wrap the heading and the sub-block content in a
+                // container so that the whole section can be hidden
+                // on the client side if no courses are found for this
+                // category when loading the first page.
+                $html .= \html_writer::start_div('block_vitrina-categorysection', [
+                    'data-vitrina-uniqueid' => $uniqueid,
+                ]);
 
                 // Optional category title before each sub-block.
                 $category = \core_course_category::get($categoryid, IGNORE_MISSING);
@@ -270,7 +240,7 @@ class block_vitrina extends block_base {
                     // vertical spacing.
                     $html .= \html_writer::tag('h4', $link, [
                         'class' => 'block_vitrina-categorytitle',
-                        'style' => 'margin-top:12px;margin-bottom:2px;',
+                        'style' => 'margin-top:18px;margin-bottom:2px;',
                     ]);
                 }
 
@@ -292,6 +262,8 @@ class block_vitrina extends block_base {
                     'catalog',
                     [$uniqueid, $tabs[0], $this->instance->id, $amount, $fixedfilters]
                 );
+
+                $html .= \html_writer::end_div();
             }
         } else {
             // Default behaviour: single unified block using all configured

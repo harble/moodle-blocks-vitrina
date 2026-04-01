@@ -240,6 +240,19 @@ function loadCourses(uniqueid, $tabcontent) {
             $tabcontent.removeClass('loading');
 
             if (paging[uniqueid][view].ended) {
+                // If this tab for this uniqueid has no courses at all
+                // on its first load, and this block comes from a
+                // split-by-category section, hide the entire section
+                // wrapper instead of showing an empty "no courses"
+                // message inside the tab.
+                if (paging[uniqueid][view].loaded === 0) {
+                    var $section = $('[data-vitrina-uniqueid="' + uniqueid + '"]');
+                    if ($section.length) {
+                        $section.remove();
+                        return;
+                    }
+                }
+
                 $tabcontent.addClass('ended');
                 $tabcontent.find('.loadmore').hide();
 
