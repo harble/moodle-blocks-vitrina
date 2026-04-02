@@ -190,6 +190,7 @@ $string['viewall'] = '查看更多...';
 $string['viewsicons'] = '视图图标';
 $string['coursetype_category_title'] = '课程类别：{$a}';
 $string['coursetype_tags_title'] = '课程标签：{$a}';
+$string['coursetype_code_title'] = '课程代码：{$a}';
 $string['viewsicons_help'] = '为各视图选择要显示的图标，通常用于标签菜单。
 每行一个，格式：viewname=typo/icon，例如：greats=i/star。如果未指定，将使用默认图标。
 可用视图：default、recents、greats、premium。';

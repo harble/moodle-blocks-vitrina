@@ -191,6 +191,7 @@ $string['viewall'] = 'View more...';
 $string['viewsicons'] = 'Icons to views';
 $string['coursetype_category_title'] = 'Course category: {$a}';
 $string['coursetype_tags_title'] = 'Course tags: {$a}';
+$string['coursetype_code_title'] = 'Course code: {$a}';
 $string['viewsicons_help'] = 'Choose the icons to display based on the view, typically for the tabs menu.
 One per line, with the following structure: viewname=typo/icon. For example: greats=i/star. If none is specified, the default will be used.
 The available views are: default, recents, greats, premium.';

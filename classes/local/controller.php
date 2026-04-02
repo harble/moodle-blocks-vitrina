@@ -514,8 +514,12 @@ class controller {
         $datas = $handler->get_instance_data($course->id);
 
         $label = '';
+        $codevalue = '';
+        $codefield = self::get_codefield();
         foreach ($datas as $data) {
-            if ((int)$data->get_field()->get('id') === (int)$field->id) {
+            $fieldid = (int)$data->get_field()->get('id');
+
+            if ($fieldid === (int)$field->id) {
                 $value = $data->export_value();
                 if (is_string($value)) {
                     $value = trim($value);
@@ -524,7 +528,17 @@ class controller {
                 if (!empty($value)) {
                     $label = (string)$value;
                 }
-                break;
+            }
+
+            if ($codefield && $fieldid === (int)$codefield->id) {
+                $value = $data->export_value();
+                if (is_string($value)) {
+                    $value = trim($value);
+                }
+
+                if (!empty($value)) {
+                    $codevalue = (string)$value;
+                }
             }
         }
 
@@ -551,9 +565,17 @@ class controller {
             }
         }
 
+        $codetitle = '';
+        if ($codevalue !== '') {
+            $codetitle = get_string('coursetype_code_title', 'block_vitrina', $codevalue);
+        }
+
         $fulltitle = $categorytitle;
         if ($tagstitle !== '') {
             $fulltitle = $fulltitle !== '' ? ($fulltitle . "\n" . $tagstitle) : $tagstitle;
+        }
+        if ($codetitle !== '') {
+            $fulltitle = $fulltitle !== '' ? ($fulltitle . "\n" . $codetitle) : $codetitle;
         }
 
         if ($label === '') {

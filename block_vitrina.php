@@ -240,7 +240,7 @@ class block_vitrina extends block_base {
                     // vertical spacing.
                     $html .= \html_writer::tag('h4', $link, [
                         'class' => 'block_vitrina-categorytitle',
-                        'style' => 'margin-top:18px;margin-bottom:2px;',
+                        'style' => 'margin-top:18px;margin-bottom:2px;font-size:large;',
                     ]);
                 }
 
