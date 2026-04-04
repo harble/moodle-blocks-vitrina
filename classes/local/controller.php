@@ -411,6 +411,15 @@ class controller {
                     $one->summary = self::sanitize_summary($one->summary);
                     $one->hassummary = !empty($one->summary);
 
+                    // Plain-text summary for use in attributes like title,
+                    // mirroring the logic in the course renderer.
+                    if (!empty($one->summary)) {
+                        $summarytext = trim(strip_tags($one->summary));
+                        if ($summarytext !== '') {
+                            $one->summarytitle = \core_text::substr($summarytext, 0, 200);
+                        }
+                    }
+
                     if (!$isuserpremium && $payfield) {
                         $one->paymenturl = $DB->get_field(
                             'customfield_data',
@@ -443,7 +452,14 @@ class controller {
                             $one->rating->percent = round($onerating->total * 20);
                             $one->rating->formated = str_pad($onerating->total, 3, '.0');
                             $one->hasrating = true;
-                            $one->rating->stars = $onerating->total > 0 ? range(1, $onerating->total) : null;
+                            $one->rating->stars = $onerating->total > 0 ? range($onerating->total, $onerating->total) : null;
+                            // Provide the same hover title used in the
+                            // catalog cards so that the related-courses
+                            // stars have a meaningful title attribute.
+                            $one->rating->title = get_string('rating_detail_title', 'block_vitrina', (object) [
+                                'avg' => $one->rating->formated,
+                                'count' => $one->rating->count,
+                            ]);
                         }
                     }
 
