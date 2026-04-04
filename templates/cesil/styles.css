@@ -267,6 +267,7 @@
 
 #page-blocks-vitrina-detail .content-layout {
     flex-direction: column-reverse;
+    align-items: stretch;
 }
 
 .block_vitrina-courseslist .coursebox.state-waiting {

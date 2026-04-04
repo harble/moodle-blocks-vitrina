@@ -413,7 +413,7 @@
 @media (min-width: 1281px) {
 
     #page-blocks-vitrina-detail .container {
-        max-width: 2100px;
+        max-width: 1400px;
     }
 
     #page-blocks-vitrina-detail #box-main_content .btn {
@@ -562,6 +562,7 @@
 
     #page-blocks-vitrina-detail .information-structure {
         flex-direction: column-reverse;
+        align-items: stretch;
     }
 
     #page-blocks-vitrina-detail .course-general-info {

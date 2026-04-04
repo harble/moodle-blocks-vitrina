@@ -371,8 +371,6 @@
 
 #page-blocks-vitrina-detail .coursebanner-box {
     position: relative;
-    min-height: 178px;
-    background-color: #eee;
     display: flex;
     align-items: center;
     background-repeat: no-repeat;
@@ -674,7 +672,7 @@
 /* Tabs control */
 .block_vitrina-tabs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     border-bottom: 1px solid #ddd;
 }
 
