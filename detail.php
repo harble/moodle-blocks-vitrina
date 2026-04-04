@@ -254,9 +254,21 @@ do {
             }
         }
     }
-} while (false); // Trick to avoid nesting of IF statements.
+    } while (false); // Trick to avoid nesting of IF statements.
 
-\block_vitrina\local\controller::include_templatecss();
+    // If called from a specific Vitrina block instance and the course
+    // allows guest access, bypass the Vitrina detail and go directly
+    // to the Moodle course view page.
+    $instanceid = optional_param('instanceid', 0, PARAM_INT);
+    if ($instanceid > 0) {
+        \block_vitrina\local\controller::load_enrolinfo($course);
+
+        if (!empty($course->enrollsavailables['guest']) && $course->visible) {
+            redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
+        }
+    }
+
+    \block_vitrina\local\controller::include_templatecss($instanceid ?: 0);
 
 echo $OUTPUT->header();
 
