@@ -170,7 +170,7 @@
 }
 
 #page-blocks-vitrina-detail .course-detail {
-    padding-top: 20px;
+    padding-top: 2px;
 }
 
 #page-blocks-vitrina-detail .btn-primary {
@@ -480,7 +480,7 @@
 
 #page-blocks-vitrina-detail .relatedcourses > div .vitrina-ranking-stars {
     float: right;
-    margin-top: 35px;
+    margin-top: 1px;
 }
 
 #page-blocks-vitrina-detail .experts-box p::after {

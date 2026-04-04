@@ -44,7 +44,7 @@ $syscontext = context_system::instance();
 $PAGE->set_context($syscontext);
 $PAGE->set_url('/blocks/vitrina/detail.php', ['id' => $course->id]);
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_heading(get_string('coursedetail', 'block_vitrina', $course));
+// $PAGE->set_heading(get_string('coursedetail', 'block_vitrina', $course));
 $PAGE->set_title(get_string('coursedetailtitle', 'block_vitrina', $course));
 $PAGE->set_course($course);
 

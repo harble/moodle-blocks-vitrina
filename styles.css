@@ -118,7 +118,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 10px 4px;
+    padding: 4px 5px 4px;
     font-size: 90%;
 }
 
@@ -184,6 +184,12 @@
     max-width: 940px;
     margin: auto;
     padding: 0 20px;
+}
+
+/* Remove top margin from main-inner wrapper on detail pages */
+#page-blocks-vitrina-detail #page.drawers #topofscroll.main-inner,
+#page-blocks-vitrina-detail #topofscroll.main-inner {
+    margin-top: -20px;
 }
 
 #page-blocks-vitrina-detail .content-layout .content-box {
@@ -374,6 +380,7 @@
     background-position: center;
     max-height: 200px;
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 #page-blocks-vitrina-detail .coursebanner-box img {
@@ -455,6 +462,12 @@
 
 #page-blocks-vitrina-detail .course-detail .enroll-content em {
     font-size: 20px;
+}
+
+/* Make the main enrol buttons text larger on detail pages */
+#page-blocks-vitrina-detail .course-detail .enroll-container a.btn,
+#page-blocks-vitrina-detail .course-detail .enroll-container button.btn {
+    font-size: large;
 }
 
 #page-blocks-vitrina-detail .course-detail .enroll-container .requireauth {
