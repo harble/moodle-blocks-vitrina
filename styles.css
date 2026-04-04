@@ -393,7 +393,10 @@
     line-height: 24px;
     width: 100%;
     max-width: 500px;
-    background-color: #aaa;
+    /* Fallback 纯色背景 */
+    background-color: rgba(90, 90, 90, 0.4) !important;
+    /* 让条带边缘更柔和的阴影 */
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.35);
     background-size: cover;
     background-repeat: no-repeat;
     position: absolute;
@@ -707,6 +710,8 @@
     background-color: transparent;
     color: #8d7e78;
     border-color: #8d7e78;
+    padding: 5px;
+    font-size: medium;
 }
 
 .block_vitrina-tabcontent .loadmore:hover {
