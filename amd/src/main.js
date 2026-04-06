@@ -241,15 +241,30 @@ function loadCourses(uniqueid, $tabcontent) {
 
             if (paging[uniqueid][view].ended) {
                 // If this tab for this uniqueid has no courses at all
-                // on its first load, and this block comes from a
+                // AND no other tab for this block instance has ever
+                // loaded courses, and this block comes from a
                 // split-by-category section, hide the entire section
                 // wrapper instead of showing an empty "no courses"
-                // message inside the tab.
+                // message inside the tab. Once any tab has shown
+                // courses, later empty tabs should just show the
+                // "no courses" message and keep the block visible.
                 if (paging[uniqueid][view].loaded === 0) {
-                    var $section = $('[data-vitrina-uniqueid="' + uniqueid + '"]');
-                    if ($section.length) {
-                        $section.remove();
-                        return;
+                    var totalloaded = 0;
+
+                    if (paging[uniqueid] !== undefined) {
+                        Object.keys(paging[uniqueid]).forEach(function(viewkey) {
+                            if (paging[uniqueid][viewkey] !== undefined) {
+                                totalloaded += paging[uniqueid][viewkey].loaded;
+                            }
+                        });
+                    }
+
+                    if (totalloaded === 0) {
+                        var $section = $('[data-vitrina-uniqueid="' + uniqueid + '"]');
+                        if ($section.length) {
+                            $section.remove();
+                            return;
+                        }
                     }
                 }
 
