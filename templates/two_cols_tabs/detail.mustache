@@ -158,15 +158,12 @@
                     {{/longcustomfields}}
                 {{/custom}}
                 {{#hasinstructors}}
-                    <div id="tab-experts" class="tab-pane nav-item longcustomfields-box experts-box">
+                    <div id="tab-experts" class="tab-pane nav-item longcustomfields-box experts-box" style="display:block">
                     {{#instructors}}
                         <div>
                             <img src="{{userpicture}}" alt="{{firstname}}" width="138" height="132" />
                             <strong>{{firstname}} {{lastname}}</strong>
                             <em>{{imagealt}}</em>
-                            <p>
-                                {{{summary}}}
-                            </p>
                         </div>
                     {{/instructors}}
                     </div>
