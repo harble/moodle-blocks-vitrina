@@ -802,6 +802,7 @@ class controller {
         $coursefull = new \core_course_list_element($course);
 
         $courseimage = '';
+        $fallbackimagefile = null;
         foreach ($coursefull->get_course_overviewfiles() as $file) {
             $isimage = $file->is_valid_image();
 
@@ -818,6 +819,25 @@ class controller {
                 $courseimage = $url;
                 break;
             }
+
+            // 如果 is_valid_image 判定失败，但 MIME 仍然是 image/*，记录为兜底候选。
+            if ($fallbackimagefile === null && strpos((string)$file->get_mimetype(), 'image/') === 0) {
+                $fallbackimagefile = $file;
+            }
+        }
+
+        // 如果没有任何通过 is_valid_image 的文件，但存在 MIME 为 image/* 的概览文件，则使用它作为封面。
+        if (empty($courseimage) && $fallbackimagefile !== null) {
+            $urlpath = '/' . $fallbackimagefile->get_contextid() . '/' . $fallbackimagefile->get_component() . '/';
+            $urlpath .= $fallbackimagefile->get_filearea() . $fallbackimagefile->get_filepath() . $fallbackimagefile->get_filename();
+
+            $url = \moodle_url::make_file_url(
+                "$CFG->wwwroot/pluginfile.php",
+                $urlpath,
+                false
+            );
+
+            $courseimage = $url;
         }
 
         if (empty($courseimage)) {
