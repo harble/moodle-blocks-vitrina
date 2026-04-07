@@ -268,7 +268,7 @@ do {
         }
     }
 
-    \block_vitrina\local\controller::include_templatecss($instanceid ?: 0);
+    \block_vitrina\local\controller::include_templatecss();
 
 echo $OUTPUT->header();
 
