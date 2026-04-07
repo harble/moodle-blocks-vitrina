@@ -694,6 +694,10 @@
     border-bottom-color: var(--primary);
 }
 
+.block_vitrina-tabs .icon {
+    margin-right: 0px;
+}
+
 .block_vitrina-tabcontent {
     padding: 10px 0;
     display: none;
@@ -973,7 +977,7 @@
 
     .block_vitrina-content.opened-popup #vitrina-filtercol {
         position: fixed;
-        top: 50px;
+        top: 65px;
         right: 0;
         bottom: 0;
         left: 0;
@@ -981,6 +985,7 @@
         background-color: #3338;
         padding: 30px 20px 20px;
         display: block;
+        width: 60%;
     }
 
     .block_vitrina-tabs {
