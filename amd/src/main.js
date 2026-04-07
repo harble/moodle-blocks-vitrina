@@ -526,6 +526,25 @@ export const filters = (uniqueid, selectedfilters = []) => {
     var $categoryControl = $filtersbox.find('.filtercontrol[data-key="categories"]');
     if ($categoryControl.length) {
 
+        // Keep the state of the optional "select all" checkbox in sync
+        // with the individual category checkboxes.
+        var $selectAllCategories = $categoryControl.find('.vitrina-categories-selectall');
+
+        var syncSelectAllCategories = function() {
+            if (!$selectAllCategories.length) {
+                return;
+            }
+
+            var $allCategoryCheckboxes = $categoryControl.find('input.filteroption');
+            if ($allCategoryCheckboxes.length === 0) {
+                $selectAllCategories.prop('checked', false);
+                return;
+            }
+
+            var allChecked = $allCategoryCheckboxes.filter(':checked').length === $allCategoryCheckboxes.length;
+            $selectAllCategories.prop('checked', allChecked);
+        };
+
         var updateTreeExpansion = function() {
             $categoryControl.find('.filter-optiongroup.haschilds').each(function() {
                 var $group = $(this);
@@ -546,6 +565,25 @@ export const filters = (uniqueid, selectedfilters = []) => {
 
         // Initial expansion based on any preselected categories.
         updateTreeExpansion();
+        syncSelectAllCategories();
+
+        // Toggle all categories when the "select all" checkbox changes.
+        if ($selectAllCategories.length) {
+            $selectAllCategories.on('change', function() {
+                var checked = $(this).is(':checked');
+
+                // Select/unselect all category checkboxes (including children).
+                $categoryControl.find('input.filteroption').prop('checked', checked);
+
+                // Update tree UI and re-sync the select-all state.
+                updateTreeExpansion();
+                syncSelectAllCategories();
+
+                // Apply filters so the catalog reloads according to the
+                // new category selection.
+                applyFilters();
+            });
+        }
 
         // Toggle expand/collapse when clicking on the parent icon.
         $categoryControl.on('click', '.tree-toggle', function(e) {
@@ -566,6 +604,7 @@ export const filters = (uniqueid, selectedfilters = []) => {
         // Keep expansion state in sync with checkbox changes.
         $categoryControl.on('change', 'input.filteroption', function() {
             updateTreeExpansion();
+            syncSelectAllCategories();
         });
     }
 

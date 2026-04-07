@@ -104,7 +104,17 @@
 
                 {{#filtercontrols}}
                     <div class="filtercontrol" data-key="{{key}}">
-                        <h5>{{title}}</h5>
+                        {{#is_categories}}
+                            <div class="filter-selectall" style="position:absolute;margin-top:8px;">
+                                <input type="checkbox"
+                                       id="vitrina-categories-selectall-{{uniqueid}}"
+                                       class="vitrina-categories-selectall">
+                                <label for="vitrina-categories-selectall-{{uniqueid}}" style="display:none">
+                                    {{#str}} selectall, core {{/str}}
+                                </label>
+                            </div>
+                        {{/is_categories}}
+                        <h5>{{title}}</h5>                        
                         <ul class="filteroptions">
                             {{#options}}
                                 {{>block_vitrina/filterchild}}
