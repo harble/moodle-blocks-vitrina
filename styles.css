@@ -405,6 +405,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     position: absolute;
+    letter-spacing: 0.2em;
 }
 
 #page-blocks-vitrina-detail .coursebanner-box .coursetitle span {

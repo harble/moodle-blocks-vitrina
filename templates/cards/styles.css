@@ -5,6 +5,7 @@
 
 .block_vitrina-courseslist .coursebox {
     width: 255px;
+    min-width: 255px;
     height: 320px;
     border-radius: 20px;
     margin: 15px 10px 10px;
