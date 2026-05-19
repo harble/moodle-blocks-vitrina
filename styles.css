@@ -176,6 +176,20 @@
     color: #aaaaaa;
 }
 
+.block_vitrina-courseslist .coursebox .course-enrolled-label-link {
+    color: #aaaaaa;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.block_vitrina-courseslist .coursebox .course-enrolled-label-link:hover {
+    text-decoration: underline;
+}
+
+.block_vitrina-courseslist .coursebox .course-enrolled-label-link:visited {
+    color: #aaaaaa;
+}
+
 .block_vitrina-courseslist .coursebox .vitrina-course-type-icon .icon {
     margin: 0;
     font-size: 130%;
