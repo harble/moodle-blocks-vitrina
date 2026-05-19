@@ -30,6 +30,65 @@
  */
 class block_vitrina extends block_base {
     /**
+     * Determine whether the header editor content is effectively empty.
+     *
+     * @param string $html
+     * @return bool
+     */
+    private function is_empty_header_content(string $html): bool {
+        $plain = html_to_text($html, 0, false);
+        return $plain === '';
+    }
+
+    /**
+     * Build automatic header menu HTML for selected categories.
+     *
+     * @param array $categoryids
+     * @return string
+     */
+    private function build_auto_category_header_menu(array $categoryids): string {
+        $items = [];
+
+        foreach ($categoryids as $categoryid) {
+            $categoryid = (int)$categoryid;
+            if (empty($categoryid)) {
+                continue;
+            }
+
+            $category = \core_course_category::get($categoryid, IGNORE_MISSING);
+            if (!$category) {
+                continue;
+            }
+
+            $url = new \moodle_url('/blocks/vitrina/index.php', [
+                'view' => 'default',
+                'id' => $this->instance->id,
+                'categoryid' => $categoryid,
+            ]);
+
+            $items[] = \html_writer::link(
+                $url,
+                $category->get_formatted_name(),
+                [
+                    'class' => 'block_vitrina-autoheader-item',
+                    'target' => '_blank',
+                    'rel' => 'noopener noreferrer',
+                ]
+            );
+        }
+
+        if (empty($items)) {
+            return '';
+        }
+
+        return \html_writer::div(
+            implode('', $items),
+            'block_vitrina-autoheader-menu',
+            ['role' => 'navigation', 'aria-label' => get_string('categories', 'block_vitrina')]
+        );
+    }
+
+    /**
      * Initialice the block.
      */
     public function init() {
@@ -294,9 +353,27 @@ class block_vitrina extends block_base {
      * @return void
      */
     public function instance_config_save($data, $nolongerused = false) {
-        global $DB;
-
         $config = clone($data);
+
+        $splitbycategories = !empty($data->splitbycategories);
+        $selectedcategories = [];
+        if (!empty($data->categories) && is_array($data->categories)) {
+            $selectedcategories = array_values(array_filter(array_map('intval', $data->categories)));
+        }
+
+        $rawheadertext = $data->htmlheader['text'] ?? '';
+        $shouldautogenerateheader = $splitbycategories
+            && count($selectedcategories) > 2
+            && $this->is_empty_header_content($rawheadertext);
+
+        if ($shouldautogenerateheader) {
+            $generatedheader = $this->build_auto_category_header_menu($selectedcategories);
+            if ($generatedheader !== '') {
+                $data->htmlheader['text'] = $generatedheader;
+                $data->htmlheader['format'] = FORMAT_HTML;
+            }
+        }
+
         // Move embedded files into a proper filearea and adjust HTML links to match.
         $config->htmlheader = file_save_draft_area_files(
             $data->htmlheader['itemid'],
