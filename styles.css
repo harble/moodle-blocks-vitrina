@@ -247,7 +247,10 @@
 
 /* Remove top margin from main-inner wrapper on detail pages */
 #page-blocks-vitrina-detail #page.drawers #topofscroll.main-inner,
-#page-blocks-vitrina-detail #topofscroll.main-inner {
+#page-blocks-vitrina-detail #topofscroll.main-inner,
+#page-blocks-vitrina-index #topofscroll.main-inner,
+#page-blocks-vitrinadb-detail #topofscroll.main-inner,
+#page-blocks-vitrinadb-index #topofscroll.main-inner {
     margin-top: -20px;
 }
 
