@@ -259,6 +259,26 @@ class block_vitrina extends block_base {
             $instancecategories = $this->config->categories;
         }
 
+        $coursetypefieldid = 0;
+        $configuredcustomfields = \block_vitrina\local\controller::get_configuredcustomfields();
+        foreach ($configuredcustomfields as $field) {
+            if ($field->type === 'select' || $field->type === 'multiselect') {
+                $coursetypefieldid = (int)$field->id;
+                break;
+            }
+        }
+
+        $fixedcoursetypevalues = [];
+        if (!empty($this->config->coursetypevalues) && $coursetypefieldid > 0) {
+            if (is_array($this->config->coursetypevalues)) {
+                $fixedcoursetypevalues = $this->config->coursetypevalues;
+            } else {
+                $fixedcoursetypevalues = explode(',', (string)$this->config->coursetypevalues);
+            }
+
+            $fixedcoursetypevalues = array_values(array_filter(array_map('intval', $fixedcoursetypevalues)));
+        }
+
         if ($splitbycategories && count($instancecategories) > 1) {
             foreach ($instancecategories as $categoryid) {
                 $categoryid = (int)$categoryid;
@@ -316,6 +336,13 @@ class block_vitrina extends block_base {
                     ],
                 ];
 
+                if (!empty($fixedcoursetypevalues) && $coursetypefieldid > 0) {
+                    $fixedfilters[] = [
+                        'type' => (string)$coursetypefieldid,
+                        'values' => $fixedcoursetypevalues,
+                    ];
+                }
+
                 $this->page->requires->js_call_amd(
                     'block_vitrina/main',
                     'catalog',
@@ -331,10 +358,18 @@ class block_vitrina extends block_base {
             $renderable = new \block_vitrina\output\main($uniqueid, $tabs[0], $this->instance->id, $tabs, null);
             $html .= $renderer->render($renderable);
 
+            $fixedfilters = [];
+            if (!empty($fixedcoursetypevalues) && $coursetypefieldid > 0) {
+                $fixedfilters[] = [
+                    'type' => (string)$coursetypefieldid,
+                    'values' => $fixedcoursetypevalues,
+                ];
+            }
+
             $this->page->requires->js_call_amd(
                 'block_vitrina/main',
                 'catalog',
-                [$uniqueid, $tabs[0], $this->instance->id, $amount]
+                [$uniqueid, $tabs[0], $this->instance->id, $amount, $fixedfilters]
             );
         }
 
@@ -354,6 +389,15 @@ class block_vitrina extends block_base {
      */
     public function instance_config_save($data, $nolongerused = false) {
         $config = clone($data);
+
+        $config->coursetypevalues = [];
+        if (!empty($data->coursetypevalues)) {
+            if (is_array($data->coursetypevalues)) {
+                $config->coursetypevalues = array_values(array_filter(array_map('intval', $data->coursetypevalues)));
+            } else {
+                $config->coursetypevalues = array_values(array_filter(array_map('intval', explode(',', (string)$data->coursetypevalues))));
+            }
+        }
 
         $splitbycategories = !empty($data->splitbycategories);
         $selectedcategories = [];

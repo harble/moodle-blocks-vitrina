@@ -139,6 +139,49 @@ class block_vitrina_edit_form extends block_edit_form {
             $mform->addHelpButton('config_tags', 'coursetagsfilter', 'block_vitrina');
         }
 
+        // Fixed course type filter for this block instance.
+        $coursetypefield = null;
+        $configuredcustomfields = \block_vitrina\local\controller::get_configuredcustomfields();
+        foreach ($configuredcustomfields as $field) {
+            if ($field->type === 'select' || $field->type === 'multiselect') {
+                $coursetypefield = $field;
+                break;
+            }
+        }
+
+        if ($coursetypefield) {
+            $coursetypeoptions = [];
+            $configdata = @json_decode($coursetypefield->configdata);
+
+            if (!empty($configdata->options)) {
+                $parsedoptions = explode("\n", $configdata->options);
+
+                foreach ($parsedoptions as $pos => $value) {
+                    $value = trim($value);
+                    if ($value === '') {
+                        continue;
+                    }
+
+                    $index = $pos + 1;
+                    $coursetypeoptions[$index] = format_string($value, true);
+                }
+            }
+
+            if (!empty($coursetypeoptions)) {
+                $mform->addElement(
+                    'autocomplete',
+                    'config_coursetypevalues',
+                    get_string('coursetypefilter', 'block_vitrina'),
+                    $coursetypeoptions,
+                    [
+                        'multiple' => true,
+                        'noselectionstring' => get_string('all'),
+                    ]
+                );
+                $mform->addHelpButton('config_coursetypevalues', 'coursetypefilter', 'block_vitrina');
+            }
+        }
+
         // ------- NEW ADDED
         // Sort by default.
         $sortOptions = [
@@ -205,6 +248,10 @@ class block_vitrina_edit_form extends block_edit_form {
      * @return void
      */
     public function set_data($defaults) {
+
+        if (!empty($defaults->config_coursetypevalues) && !is_array($defaults->config_coursetypevalues)) {
+            $defaults->config_coursetypevalues = array_values(array_filter(array_map('intval', explode(',', (string)$defaults->config_coursetypevalues))));
+        }
 
         // Set data for header.
         if (!empty($this->block->config) && !empty($this->block->config->htmlheader)) {
