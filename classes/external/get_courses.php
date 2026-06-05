@@ -198,7 +198,10 @@ class get_courses extends external_api {
         // If this is a block instance call and there are still no
         // categories (no explicit filter and no instance categories),
         // then fall back to the plugin-level categories configuration
-        // if available; otherwise, do not return any courses.
+        // if available. If there are other filters already active
+        // (for example tags, course type or full text), allow the
+        // query to continue without categories so it searches across
+        // all courses.
         if (!empty($params['instanceid']) && count($categoriesids) == 0) {
             $globalcategoriesids = [];
             $categories = get_config('block_vitrina', 'categories');
@@ -215,10 +218,13 @@ class get_courses extends external_api {
             if (count($globalcategoriesids) > 0) {
                 $categoriesids = $globalcategoriesids;
             } else {
-                // Block instance has no categories and the global plugin
-                // configuration also has no categories selected: do not
-                // perform the query and return no courses.
-                return [];
+                if (empty($params['filters'])) {
+                    // Block instance has no categories and the global plugin
+                    // configuration also has no categories selected, and
+                    // there are no other filters to narrow the query.
+                    // Do not perform the query.
+                    return [];
+                }
             }
         }
         // End of read categories and instance configuration.
