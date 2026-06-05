@@ -39,14 +39,14 @@
 }
 
 .block_vitrina-courseslist .coursebox .panel-body h3.course-name {
-    padding-inline: 20px;
+    padding-inline: 10px;
     text-align: left;
     font-size: 1.1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: -10px;
-    font-size: medium;
+    font-size: inherit;
 }
 
 .block_vitrina-courseslist .coursebox .panel-body .coursesummary {
