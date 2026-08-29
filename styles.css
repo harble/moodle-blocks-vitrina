@@ -1069,11 +1069,11 @@
 
 /* Course info icon */
 .block_vitrina-courseslist .coursebox .course-info-icon {
+    display: flex;
     position: absolute;
     bottom: 13px;
     right: 8px;
     z-index: 10;
-    display: flex;
     align-items: center;
     justify-content: center;
     width: 24px;

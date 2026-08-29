@@ -90,8 +90,12 @@
     left: 0;
 }
 
-.block_vitrina-courseslist .coursebox .coursefee {
-    padding: 10px;
+.block_vitrina-courseslist .coursebox .course-info-icon {
+    display: none;
+}
+
+.block_vitrina-courseslist .coursebox:hover .course-info-icon {
+    display: flex;
 }
 
 .block_vitrina-courseslist .coursebox .feeinfo {
