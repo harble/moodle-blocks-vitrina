@@ -1070,7 +1070,7 @@
 /* Course info icon */
 .block_vitrina-courseslist .coursebox .course-info-icon {
     position: absolute;
-    bottom: 8px;
+    bottom: 13px;
     right: 8px;
     z-index: 10;
     display: flex;
@@ -1078,9 +1078,9 @@
     justify-content: center;
     width: 24px;
     height: 24px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.45);
-    color: #fff;
+    border-radius: 50%;    
+    border: solid 1px rgb(99, 99, 99);
+    color: rgb(99, 99, 99);
     font-size: 13px;
     font-weight: bold;
     font-style: italic;
