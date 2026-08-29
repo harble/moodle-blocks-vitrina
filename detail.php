@@ -26,6 +26,7 @@ require_once('../../config.php');
 require_once('classes/output/detail.php');
 
 $id = optional_param('id', 0, PARAM_INT);
+$direct = optional_param('direct', 0, PARAM_INT);
 $enroll = optional_param('enroll', false, PARAM_BOOL);
 $tologin = optional_param('tologin', false, PARAM_BOOL);
 $enroltype = optional_param('enroltype', '', PARAM_TEXT);
@@ -49,6 +50,62 @@ $PAGE->set_title(get_string('coursedetailtitle', 'block_vitrina', $course));
 $PAGE->set_course($course);
 
 $msg = [];
+
+// Auto direct enrolment: if enabled and requested from a course card click,
+// try to enrol the user automatically and redirect to the course view page.
+if ($direct && get_config('block_vitrina', 'autodirectenrol') && $course->visible) {
+    \block_vitrina\local\controller::load_enrolinfo($course);
+
+    $coursecontext = \context_course::instance($course->id);
+
+    // Already enrolled or has view capability → go directly to course.
+    if (is_enrolled($coursecontext) || has_capability('moodle/course:view', $coursecontext)) {
+        redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
+    }
+
+    // Guest access available → go directly to course.
+    if (!empty($course->enrollsavailables['guest'])) {
+        redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
+    }
+
+    // Not logged in → redirect to login first, then come back.
+    if (isguestuser() || !isloggedin()) {
+        $SESSION->wantsurl = (string)(new moodle_url('/blocks/vitrina/detail.php',
+            ['id' => $course->id, 'direct' => 1]));
+        redirect(get_login_url());
+    }
+
+    // Determine if the course can be auto-enrolled.
+    $canautoenroll = false;
+    $autoenroltype = '';
+
+    if (array_key_exists('premium', $course->enrollsavailables)) {
+        $canautoenroll = true;
+        $autoenroltype = '';
+    } else if (array_key_exists('self', $course->enrollsavailables)) {
+        $instances = $course->enrollsavailables['self'];
+        if (count($instances) === 1) {
+            $instance = reset($instances);
+            if (empty($instance->password)) {
+                $canautoenroll = true;
+                $autoenroltype = 'self';
+            }
+        }
+    }
+
+    if ($canautoenroll && !$enroll) {
+        $params = [
+            'id' => $course->id,
+            'enroll' => 1,
+            'sesskey' => sesskey(),
+            'enroltype' => $autoenroltype,
+            'direct' => 1,
+        ];
+        redirect(new moodle_url('/blocks/vitrina/detail.php', $params));
+    }
+    // If the course cannot be auto-enrolled (payment, password, token, etc.),
+    // fall through to render the normal detail page.
+}
 
 if ($tologin) {
     if (isguestuser() || !isloggedin()) {
@@ -255,6 +312,14 @@ do {
         }
     }
     } while (false); // Trick to avoid nesting of IF statements.
+
+    // Auto direct enrolment: after successful enrolment, redirect to course view.
+    if ($direct && get_config('block_vitrina', 'autodirectenrol') && $enroll) {
+        $coursecontext = \context_course::instance($course->id);
+        if (is_enrolled($coursecontext)) {
+            redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
+        }
+    }
 
     // If called from a specific Vitrina block instance and the course
     // allows guest access, bypass the Vitrina detail and go directly

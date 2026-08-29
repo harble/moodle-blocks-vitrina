@@ -41,12 +41,12 @@
     }
 }}
 
-<div class="panel panel-default coursebox coursecategory-{{category}} state-{{#active}}active{{/active}}{{^active}}waiting{{/active}} {{#premium}}type-premium{{/premium}}{{#completed}} coursecompleted{{/completed}}" data-vitrina-detailurl="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" data-vitrina-detailtarget="{{opendetailstarget}}">
+<div class="panel panel-default coursebox coursecategory-{{category}} state-{{#active}}active{{/active}}{{^active}}waiting{{/active}} {{#premium}}type-premium{{/premium}}{{#completed}} coursecompleted{{/completed}}" data-vitrina-detailurl="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" data-vitrina-detailtarget="{{opendetailstarget}}">
     <div class="panel-body clearfix">
-        <a class="" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
+        <a class="" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" target="{{opendetailstarget}}">
             <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}></div>
         </a>
-        <a  title="{{{fullname}}}" class="coursebtn submit btn btn-info btn-sm" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="{{opendetailstarget}}">
+        <a  title="{{{fullname}}}" class="coursebtn submit btn btn-info btn-sm" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" target="{{opendetailstarget}}">
             {{{fullname}}}
         </a>
         <div class="coursesummary" style="display: none;">

@@ -284,6 +284,13 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configselect($name, $title, $help, '_blank', $options);
     $settings->add($setting);
 
+    // Auto direct enrolment.
+    $name = 'block_vitrina/autodirectenrol';
+    $title = get_string('autodirectenrol', 'block_vitrina');
+    $help = get_string('autodirectenrol_help', 'block_vitrina');
+    $setting = new admin_setting_configcheckbox($name, $title, $help, 0);
+    $settings->add($setting);
+
     // Days to upcoming courses.
     $name = 'block_vitrina/daystoupcoming';
     $title = get_string('daystoupcoming', 'block_vitrina');

@@ -23,6 +23,8 @@
  */
 
 $string['amountcourses'] = 'Cantidad de cursos';
+$string['autodirectenrol'] = 'Inscripción directa automática';
+$string['autodirectenrol_help'] = 'Si se habilita, al hacer clic en la imagen o nombre de la tarjeta del curso, el estudiante se inscribirá automáticamente (cuando sea posible) y será redirigido directamente a la página de contenido del curso, sin pasar por la página de detalle. Los cursos que requieren pago, contraseña o token seguirán mostrando la página de detalle.';
 $string['amountcourses_help'] = 'Cantidad de cursos a mostrar en la vista general.';
 $string['catalog'] = 'Catálogo de cursos';
 $string['categories'] = 'Categorias';

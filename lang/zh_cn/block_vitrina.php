@@ -22,6 +22,8 @@
  */
 
 $string['amountcourses'] = '课程数量';
+$string['autodirectenrol'] = '自动选课跳转';
+$string['autodirectenrol_help'] = '启用后，点击课程卡片的图片或课程名称将自动选课（如果条件允许）并直接跳转到课程内容页，不再经过详情页。需要付费、需要密码或需要口令的课程仍会显示详情页。';
 $string['amountcourses_help'] = '在主视图中要显示的课程数量。';
 $string['catalog'] = '课程目录';
 $string['categories'] = '课程类别';

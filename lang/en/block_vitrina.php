@@ -23,6 +23,8 @@
  */
 
 $string['amountcourses'] = 'Amount courses';
+$string['autodirectenrol'] = 'Auto direct enrolment';
+$string['autodirectenrol_help'] = 'If enabled, clicking a course card image or name will automatically enrol the student (when possible) and redirect directly to the course content page, bypassing the detail page. Courses that require payment, password or token will still display the detail page.';
 $string['amountcourses_help'] = 'Amount courses to display in the main view.';
 $string['catalog'] = 'Catalog';
 $string['categories'] = 'Categories';
