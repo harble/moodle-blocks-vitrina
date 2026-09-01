@@ -377,6 +377,29 @@ class block_vitrina extends block_base {
 
         \block_vitrina\local\controller::include_templatecss($this->instance->id);
 
+        // Decorate the block title with a link and search icon.
+        $catalogurl = new \moodle_url('/blocks/vitrina/index.php', ['id' => $this->instance->id]);
+        $this->page->requires->js_amd_inline(<<<JS
+            require(['jquery'], function($) {
+                var header = document.getElementById('instance-{$this->instance->id}-header');
+                if (header) {
+                    var title = header.textContent.trim();
+                    var a = document.createElement('a');
+                    a.href = '{$catalogurl->out(false)}';
+                    a.className = 'block_vitrina-title-link';
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = title;
+                    var icon = document.createElement('i');
+                    icon.className = 'icon fa fa-search fa-fw block_vitrina-title-search';
+                    icon.setAttribute('aria-hidden', 'true');
+                    a.appendChild(icon);
+                    header.textContent = '';
+                    header.appendChild(a);
+                }
+            });
+        JS);
+
         return $this->content;
     }
 
