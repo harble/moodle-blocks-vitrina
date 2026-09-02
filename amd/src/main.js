@@ -556,9 +556,6 @@ export const filters = (uniqueid, selectedfilters = []) => {
                 if (hasSelectedDescendant || isSelectedSelf) {
                     $group.addClass('expanded');
                     $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
-                } else {
-                    $group.removeClass('expanded');
-                    $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
                 }
             });
         };
