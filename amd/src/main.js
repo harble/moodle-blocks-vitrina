@@ -58,6 +58,7 @@ var strings = [
     {key: 'courselinkcopiedtoclipboard', component: 'block_vitrina'},
     {key: 'nocoursesview', component: 'block_vitrina'},
     {key: 'nomorecourses', component: 'block_vitrina'},
+    {key: 'loadmoreloadedcount', component: 'block_vitrina'},
 ];
 var s = [];
 
@@ -83,6 +84,48 @@ function loadStrings() {
     });
 }
 // End of Load strings.
+
+/**
+ * Update the load-more button label with loaded count for current tab.
+ *
+ * @param {integer} uniqueid
+ * @param {object} $tabcontent
+ * @param {?integer} forcedloaded Optional explicit loaded count.
+ */
+function updateLoadMoreButtonLabel(uniqueid, $tabcontent, forcedloaded = null) {
+    var view = $tabcontent.data('view');
+    var loaded = 0;
+
+    if (forcedloaded !== null && forcedloaded !== undefined) {
+        loaded = parseInt(forcedloaded, 10) || 0;
+    } else if (
+        paging[uniqueid] !== undefined &&
+        paging[uniqueid][view] !== undefined &&
+        paging[uniqueid][view].loaded !== undefined
+    ) {
+        loaded = parseInt(paging[uniqueid][view].loaded, 10) || 0;
+    }
+
+    $tabcontent.find('.loadmore').each(function() {
+        var $button = $(this);
+        var basetext = $button.attr('data-loadmore-base');
+        var counttext = '';
+
+        if (!basetext) {
+            basetext = ($button.text() || '').trim();
+            basetext = basetext.replace(/\s*\(当前已加载\d+条\)\s*$/u, '');
+            $button.attr('data-loadmore-base', basetext);
+        }
+
+        if (s.loadmoreloadedcount && s.loadmoreloadedcount !== 'loadmoreloadedcount') {
+            counttext = s.loadmoreloadedcount.replace('{$a}', loaded);
+        } else {
+            counttext = '(当前已加载' + loaded + '条)';
+        }
+
+        $button.text(basetext + ' ' + counttext);
+    });
+}
 
 /**
  * Load courses for a tab.
@@ -239,6 +282,8 @@ function loadCourses(uniqueid, $tabcontent) {
             loading = false;
             $tabcontent.removeClass('loading');
 
+            updateLoadMoreButtonLabel(uniqueid, $tabcontent);
+
             if (paging[uniqueid][view].ended) {
                 // If this tab for this uniqueid has no courses at all
                 // AND no other tab for this block instance has ever
@@ -308,6 +353,7 @@ function restartSearch(uniqueid) {
         var $tabcontent = $($tab.attr('data-ref'));
         $tabcontent.removeClass('ended');
         $tabcontent.find('.loadmore').show();
+        updateLoadMoreButtonLabel(uniqueid, $tabcontent, 0);
         $tabcontent.find('.nocourses').addClass('hidden');
         $tabcontent.find('.courses-list').empty();
     });

@@ -95,6 +95,7 @@ $string['license-cc-by-sa'] = '知识共享 署名-相同方式共享 4.0 国际
 $string['licensefield'] = '许可证字段';
 $string['licensefield_help'] = '用于存储课程许可证信息的课程字段。';
 $string['loadmore'] = '加载更多课程';
+$string['loadmoreloadedcount'] = '（已加载 {$a} 条）';
 $string['mediafield'] = '媒体字段';
 $string['mediafield_help'] = '用于存储课程视频 URL 的课程字段。';
 $string['newblocktitle'] = 'Showcase';

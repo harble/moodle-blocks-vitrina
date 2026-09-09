@@ -96,6 +96,7 @@ $string['license-cc-by-sa'] = 'Creative Commons Attribution-ShareAlike 4.0 Inter
 $string['licensefield'] = 'License field';
 $string['licensefield_help'] = 'A course field to specify the course license';
 $string['loadmore'] = 'Load more courses';
+$string['loadmoreloadedcount'] = ' (Loaded {$a})';
 $string['mediafield'] = 'Media field';
 $string['mediafield_help'] = 'A course field to specify a special course video URL';
 $string['newblocktitle'] = 'Showcase';

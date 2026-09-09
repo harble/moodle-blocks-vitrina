@@ -90,6 +90,7 @@ $string['license-cc-by-sa'] = 'Creative Commons Atribución-CompartirIgual 4.0 L
 $string['licensefield'] = 'Campo Licencia';
 $string['licensefield_help'] = 'El nombre del campo para cargar la licencia del curso';
 $string['loadmore'] = 'Deseo ver más cursos';
+$string['loadmoreloadedcount'] = '(Cargados actualmente {$a})';
 $string['mediafield'] = 'Campo Medio';
 $string['mediafield_help'] = 'El nombre del campo para cargar una URL de video del curso';
 $string['newblocktitle'] = 'Vitrina de cursos';
