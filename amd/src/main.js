@@ -113,14 +113,14 @@ function updateLoadMoreButtonLabel(uniqueid, $tabcontent, forcedloaded = null) {
 
         if (!basetext) {
             basetext = ($button.text() || '').trim();
-            basetext = basetext.replace(/\s*\(当前已加载\d+条\)\s*$/u, '');
+            basetext = basetext.replace(/\s*[（(][^)）]*[）)]\s*$/u, '');
             $button.attr('data-loadmore-base', basetext);
         }
 
         if (s.loadmoreloadedcount && s.loadmoreloadedcount !== 'loadmoreloadedcount') {
             counttext = s.loadmoreloadedcount.replace('{$a}', loaded);
         } else {
-            counttext = '(当前已加载' + loaded + '条)';
+            counttext = '（已加载 ' + loaded + ' 条）';
         }
 
         $button.text(basetext + ' ' + counttext);
