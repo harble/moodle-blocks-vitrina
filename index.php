@@ -197,6 +197,33 @@ if (!$hascategoriesfilter) {
     }
 }
 
+// Preselect course type filter from block instance configuration.
+if (!empty($instanceid)) {
+    $coursetypefieldid = 0;
+    $configuredcustomfields = \block_vitrina\local\controller::get_configuredcustomfields();
+    foreach ($configuredcustomfields as $field) {
+        if ($field->type === 'select' || $field->type === 'multiselect') {
+            $coursetypefieldid = (int)$field->id;
+            break;
+        }
+    }
+
+    if ($coursetypefieldid > 0 && !empty($block->config->coursetypevalues)) {
+        $coursetypevalues = $block->config->coursetypevalues;
+        if (!is_array($coursetypevalues)) {
+            $coursetypevalues = explode(',', (string)$coursetypevalues);
+        }
+        $coursetypevalues = array_values(array_filter(array_map('intval', $coursetypevalues)));
+
+        if (!empty($coursetypevalues)) {
+            $filtersselected[] = (object) [
+                'key' => (string)$coursetypefieldid,
+                'values' => $coursetypevalues,
+            ];
+        }
+    }
+}
+
 $PAGE->requires->js_call_amd('block_vitrina/main', 'filters', [$uniqueid, $filtersselected]);
 $PAGE->requires->js_call_amd('block_vitrina/main', 'catalog', [$uniqueid, $view, $instanceid, $bypage]);
 
