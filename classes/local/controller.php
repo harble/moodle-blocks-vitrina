@@ -489,6 +489,111 @@ class controller {
                 }
             }
         }
+
+        // Determine meeting status from Zoom instances in this course.
+        self::load_meeting_status($course);
+    }
+
+    /**
+     * Load meeting status based on Zoom instances in the course.
+     *
+     * Possible statuses: notstarted, abouttostart, inprogress, finished.
+     *
+     * @param object $course Course object.
+     * @return void
+     */
+    protected static function load_meeting_status(object $course): void {
+        global $DB, $CFG;
+
+        $course->hasmeetingstatus = false;
+        $course->meetingstatus = '';
+        $course->meetingstatustext = '';
+
+        // Check if mod_zoom is installed.
+        if (!file_exists($CFG->dirroot . '/mod/zoom/version.php')) {
+            return;
+        }
+
+        require_once($CFG->dirroot . '/mod/zoom/locallib.php');
+
+        $now = time();
+
+        // Get all zoom instances in this course.
+        $sql = "SELECT z.*
+                  FROM {zoom} z
+                  JOIN {course_modules} cm ON cm.instance = z.id AND cm.module = (SELECT id FROM {modules} WHERE name = 'zoom')
+                  JOIN {modules} m ON m.id = cm.module AND m.visible = 1
+                 WHERE cm.course = :courseid AND cm.visible = 1";
+
+        $instances = $DB->get_records_sql($sql, ['courseid' => $course->id]);
+
+        if (empty($instances)) {
+            return;
+        }
+
+        $config = get_config('zoom');
+        $globalfirstabletojoin = $config->firstabletojoin ?? 0;
+
+        // Status priority: inprogress(4) > abouttostart(3) > notstarted(2) > finished(1).
+        $prioritymap = [
+            4 => 'inprogress',
+            3 => 'abouttostart',
+            2 => 'notstarted',
+            1 => 'finished',
+        ];
+        $toppriority = 0;
+
+        foreach ($instances as $instance) {
+            // Skip recurring meetings without fixed time.
+            if (!empty($instance->recurring) && (int)$instance->recurrence_type === ZOOM_RECURRINGTYPE_NOTIME) {
+                continue;
+            }
+
+            // For recurring meetings with schedule, get the next occurrence start time.
+            if (!empty($instance->recurring)) {
+                $starttime = zoom_get_next_occurrence($instance);
+                if ($starttime == 0) {
+                    // No more occurrences left.
+                    continue;
+                }
+            } else {
+                $starttime = (int)$instance->start_time;
+            }
+
+            $duration = (int)$instance->duration;
+            $firstabletojoin = $instance->firstabletojoin;
+            if ($firstabletojoin === null || $firstabletojoin < 0) {
+                $firstabletojoin = $globalfirstabletojoin;
+            }
+            $joinable = $starttime - ($firstabletojoin * 60);
+            $endtime = $starttime + $duration;
+
+            // Determine individual status priority for this instance.
+            $priority = 0;
+            if ($now >= $starttime && $now <= $endtime) {
+                $priority = 4; // In progress.
+            } else if ($now >= $joinable && $now < $starttime) {
+                $priority = 3; // Starting soon.
+            } else if ($now < $joinable) {
+                $priority = 2; // Not started.
+            } else {
+                $priority = 1; // Finished.
+            }
+
+            // Keep the highest priority status.
+            if ($priority > $toppriority) {
+                $toppriority = $priority;
+            }
+        }
+
+        if ($toppriority === 0) {
+            return; // No valid instances found.
+        }
+
+        $status = $prioritymap[$toppriority];
+        $course->hasmeetingstatus = true;
+        $course->meetingstatus = $status;
+        $course->meetingstatustext = get_string('meetingstatus_' . $status, 'block_vitrina');
     }
 
     /**

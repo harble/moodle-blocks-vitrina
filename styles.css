@@ -818,6 +818,35 @@
     width: 100%;
 }
 
+/* Make course image link a positioning parent for overlays */
+.block_vitrina-courseslist .coursebox .courseimage-link {
+    position: relative;
+    display: block;
+}
+
+/* Meeting status badge - overlaid on course cover image top-right */
+.block_vitrina-courseslist .coursebox .meeting-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #4a4a4a;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-icon {
+    flex-shrink: 0;
+}
+
 /* End Tabs control */
 
 /* Catalog filter layout */

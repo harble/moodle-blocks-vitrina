@@ -202,3 +202,9 @@ $string['viewsicons_help'] = '为各视图选择要显示的图标，通常用�
 $string['vitrina:addinstance'] = '添加一个新的 Showcase 区块';
 $string['vitrina:myaddinstance'] = '在仪表盘中添加一个新的 Showcase 区块';
 $string['waiting'] = '即将推出';
+
+// Meeting status strings.
+$string['meetingstatus_notstarted'] = '尚未开始';
+$string['meetingstatus_abouttostart'] = '即将开始';
+$string['meetingstatus_inprogress'] = '进行中';
+$string['meetingstatus_finished'] = '已结束';

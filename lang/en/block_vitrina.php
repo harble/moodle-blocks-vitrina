@@ -202,4 +202,12 @@ One per line, with the following structure: viewname=typo/icon. For example: gre
 The available views are: default, recents, greats, premium.';
 $string['vitrina:addinstance'] = 'Add a new Showcase block';
 $string['vitrina:myaddinstance'] = 'Add a new Showcase block to Dashboard';
+
+// Waiting label.
 $string['waiting'] = 'Waiting';
+
+// Meeting status strings.
+$string['meetingstatus_notstarted'] = 'Not started';
+$string['meetingstatus_abouttostart'] = 'Starting soon';
+$string['meetingstatus_inprogress'] = 'In progress';
+$string['meetingstatus_finished'] = 'Finished';
