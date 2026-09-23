@@ -542,6 +542,7 @@ class controller {
             1 => 'finished',
         ];
         $toppriority = 0;
+        $tooltiplines = [];
 
         foreach ($instances as $instance) {
             // Skip recurring meetings without fixed time.
@@ -584,6 +585,12 @@ class controller {
             if ($priority > $toppriority) {
                 $toppriority = $priority;
             }
+
+            // Collect instance info for tooltip.
+            $durationmins = (int)ceil($duration / 60);
+            $tooltiplines[] = $instance->name . "：\n" .
+                get_string('meetingtooltip_start', 'block_vitrina') . userdate($starttime, get_string('meetingtooltip_dateformat', 'block_vitrina')) .
+                get_string('meetingtooltip_duration', 'block_vitrina', $durationmins);
         }
 
         if ($toppriority === 0) {
@@ -594,6 +601,7 @@ class controller {
         $course->hasmeetingstatus = true;
         $course->meetingstatus = $status;
         $course->meetingstatustext = get_string('meetingstatus_' . $status, 'block_vitrina');
+        $course->meetingstatustitle = implode("\n---\n", $tooltiplines);
     }
 
     /**

@@ -211,3 +211,8 @@ $string['meetingstatus_notstarted'] = 'Not started';
 $string['meetingstatus_abouttostart'] = 'Starting soon';
 $string['meetingstatus_inprogress'] = 'In progress';
 $string['meetingstatus_finished'] = 'Finished';
+
+// Meeting tooltip strings.
+$string['meetingtooltip_start'] = 'Start time: ';
+$string['meetingtooltip_duration'] = ', Duration: {$a}min';
+$string['meetingtooltip_dateformat'] = '%Y/%m/%d %H:%M';

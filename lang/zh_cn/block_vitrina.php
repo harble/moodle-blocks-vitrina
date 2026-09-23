@@ -208,3 +208,8 @@ $string['meetingstatus_notstarted'] = '尚未开始';
 $string['meetingstatus_abouttostart'] = '即将开始';
 $string['meetingstatus_inprogress'] = '进行中';
 $string['meetingstatus_finished'] = '已结束';
+
+// Meeting tooltip strings.
+$string['meetingtooltip_start'] = '开始时间：';
+$string['meetingtooltip_duration'] = '，持续时间：{$a}分钟';
+$string['meetingtooltip_dateformat'] = '%Y/%m/%d %H:%M';
