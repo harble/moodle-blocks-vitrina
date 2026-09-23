@@ -51,11 +51,18 @@
         <a class="courseimage-link" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" target="{{opendetailstarget}}">
             <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}></div>
             {{#hasmeetingstatus}}
-            <div class="meeting-status-badge meeting-status-{{meetingstatus}}" title="{{meetingstatustitle}}">
-                <svg class="meeting-status-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                </svg>
-                <span>{{meetingstatustext}}</span>
+            <div class="meeting-status-wrapper">
+                <div class="meeting-status-badge meeting-status-{{meetingstatus}}" title="{{meetingstatustitle}}">
+                    <svg class="meeting-status-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    <span>{{meetingstatustext}}</span>
+                </div>
+                {{#hasmeetingtimeinfo}}
+                <div class="meeting-time-info">
+                    {{meetingtimeinfo}}
+                </div>
+                {{/hasmeetingtimeinfo}}
             </div>
             {{/hasmeetingstatus}}
         </a>

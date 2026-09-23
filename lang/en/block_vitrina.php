@@ -216,3 +216,5 @@ $string['meetingstatus_finished'] = 'Finished';
 $string['meetingtooltip_start'] = 'Start time: ';
 $string['meetingtooltip_duration'] = ', Duration: {$a}min';
 $string['meetingtooltip_dateformat'] = '%Y/%m/%d %H:%M';
+$string['meetingtooltip_timeformat'] = '%H:%M:%S';
+$string['meetingtooltip_datetimeformat'] = '%Y/%m/%d %H:%M';

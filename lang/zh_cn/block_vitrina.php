@@ -213,3 +213,5 @@ $string['meetingstatus_finished'] = '已结束';
 $string['meetingtooltip_start'] = '开始时间：';
 $string['meetingtooltip_duration'] = '，持续时间：{$a}分钟';
 $string['meetingtooltip_dateformat'] = '%Y/%m/%d %H:%M';
+$string['meetingtooltip_timeformat'] = '%H:%M:%S';
+$string['meetingtooltip_datetimeformat'] = '%Y/%m/%d %H:%M';

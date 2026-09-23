@@ -825,22 +825,40 @@
 }
 
 /* Meeting status badge - overlaid on course cover image top-right */
-.block_vitrina-courseslist .coursebox .meeting-status-badge {
+.block_vitrina-courseslist .coursebox .meeting-status-wrapper {
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     background-color: #4a4a4a;
     color: #fff;
     font-size: 11px;
     font-weight: 600;
     line-height: 1;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 4px 4px 0 0;
     white-space: nowrap;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-time-info {
+    background-color: #fff;
+    color: #4a4a4a;
+    font-size: 9px;
+    line-height: 1;
+    padding: 2px 8px;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 0 0 4px 4px;
 }
 
 .block_vitrina-courseslist .coursebox .meeting-status-icon {

@@ -581,9 +581,11 @@ class controller {
                 $priority = 1; // Finished.
             }
 
-            // Keep the highest priority status.
+            // Keep the highest priority status and its time info.
             if ($priority > $toppriority) {
                 $toppriority = $priority;
+                $topstarttime = $starttime;
+                $topendtime = $endtime;
             }
 
             // Collect instance info for tooltip.
@@ -602,6 +604,21 @@ class controller {
         $course->meetingstatus = $status;
         $course->meetingstatustext = get_string('meetingstatus_' . $status, 'block_vitrina');
         $course->meetingstatustitle = implode("\n---\n", $tooltiplines);
+
+        // Build time info block based on status.
+        if ($status === 'inprogress') {
+            $timeinfo = userdate($topstarttime, get_string('meetingtooltip_timeformat', 'block_vitrina')) . '~' .
+                        userdate($topendtime, get_string('meetingtooltip_timeformat', 'block_vitrina'));
+        } else if ($status === 'abouttostart' || $status === 'notstarted') {
+            $timeinfo = userdate($topstarttime, get_string('meetingtooltip_datetimeformat', 'block_vitrina'));
+        } else if ($status === 'finished') {
+            $timeinfo = userdate($topendtime, get_string('meetingtooltip_datetimeformat', 'block_vitrina'));
+        } else {
+            $timeinfo = '';
+        }
+
+        $course->hasmeetingtimeinfo = !empty($timeinfo);
+        $course->meetingtimeinfo = $timeinfo;
     }
 
     /**
