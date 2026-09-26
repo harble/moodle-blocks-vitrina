@@ -211,10 +211,15 @@ $string['meetingstatus_notstarted'] = 'Not started';
 $string['meetingstatus_abouttostart'] = 'Starting soon';
 $string['meetingstatus_inprogress'] = 'In progress';
 $string['meetingstatus_finished'] = 'Finished';
+$string['meetingstatus_ready'] = 'Ready';
 
 // Meeting tooltip strings.
+$string['meetingtooltip_recurringnotime'] = 'No fixed schedule, join anytime';
 $string['meetingtooltip_start'] = 'Start time: ';
 $string['meetingtooltip_duration'] = ', Duration: {$a}min';
 $string['meetingtooltip_dateformat'] = '%Y/%m/%d %H:%M';
 $string['meetingtooltip_timeformat'] = '%H:%M:%S';
 $string['meetingtooltip_datetimeformat'] = '%Y/%m/%d %H:%M';
+
+// Meeting time info strings.
+$string['meetingtimeinfo_recurringnotime'] = 'No Fixed Time';

@@ -840,14 +840,34 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    background-color: #4a4a4a;
     color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     line-height: 1;
     padding: 3px 8px;
     border-radius: 4px 4px 0 0;
     white-space: nowrap;
+}
+
+/* Meeting status colors - consistent with mod/zoom course page */
+.block_vitrina-courseslist .coursebox .meeting-status-badge.meeting-status-inprogress {
+    background-color: #28a745;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-badge.meeting-status-abouttostart {
+    background-color: #d97706;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-badge.meeting-status-notstarted {
+    background-color: #007bff;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-badge.meeting-status-finished {
+    background-color: #495057;
+}
+
+.block_vitrina-courseslist .coursebox .meeting-status-badge.meeting-status-ready {
+    background-color: #17a2b8;
 }
 
 .block_vitrina-courseslist .coursebox .meeting-time-info {

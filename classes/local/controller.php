@@ -534,19 +534,26 @@ class controller {
         $config = get_config('zoom');
         $globalfirstabletojoin = $config->firstabletojoin ?? 0;
 
-        // Status priority: inprogress(4) > abouttostart(3) > notstarted(2) > finished(1).
+        // Status priority: inprogress(5) > abouttostart(4) > notstarted(3) > ready(2) > finished(1).
         $prioritymap = [
-            4 => 'inprogress',
-            3 => 'abouttostart',
-            2 => 'notstarted',
+            5 => 'inprogress',
+            4 => 'abouttostart',
+            3 => 'notstarted',
+            2 => 'ready',
             1 => 'finished',
         ];
         $toppriority = 0;
         $tooltiplines = [];
 
         foreach ($instances as $instance) {
-            // Skip recurring meetings without fixed time.
+            // Recurring meeting without fixed time → "已就绪".
             if (!empty($instance->recurring) && (int)$instance->recurrence_type === ZOOM_RECURRINGTYPE_NOTIME) {
+                if (2 > $toppriority) {
+                    $toppriority = 2;
+                }
+
+                $tooltiplines[] = $instance->name . "：" .
+                    get_string('meetingtooltip_recurringnotime', 'block_vitrina');
                 continue;
             }
 
@@ -570,13 +577,15 @@ class controller {
             $endtime = $starttime + $duration;
 
             // Determine individual status priority for this instance.
+            // Priority values must match the priority map keys:
+            //   5 - inprogress, 4 - abouttostart, 3 - notstarted, 2 - ready, 1 - finished.
             $priority = 0;
             if ($now >= $starttime && $now <= $endtime) {
-                $priority = 4; // In progress.
+                $priority = 5; // In progress.
             } else if ($now >= $joinable && $now < $starttime) {
-                $priority = 3; // Starting soon.
+                $priority = 4; // Starting soon.
             } else if ($now < $joinable) {
-                $priority = 2; // Not started.
+                $priority = 3; // Not started.
             } else {
                 $priority = 1; // Finished.
             }
@@ -613,6 +622,8 @@ class controller {
             $timeinfo = userdate($topstarttime, get_string('meetingtooltip_datetimeformat', 'block_vitrina'));
         } else if ($status === 'finished') {
             $timeinfo = userdate($topendtime, get_string('meetingtooltip_datetimeformat', 'block_vitrina'));
+        } else if ($status === 'ready') {
+            $timeinfo = get_string('meetingtimeinfo_recurringnotime', 'block_vitrina');
         } else {
             $timeinfo = '';
         }
