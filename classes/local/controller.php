@@ -940,64 +940,99 @@ class controller {
     public static function get_courseimage($course): string {
         global $CFG, $OUTPUT;
 
+        // Load the central storage URL resolver when the plugin is available.
+        $centralstoragelib = $CFG->dirroot . '/repository/centralstorage/locallib.php';
+        if (is_readable($centralstoragelib)) {
+            require_once($centralstoragelib);
+        }
+
         $coursefull = new \core_course_list_element($course);
 
-        $courseimage = '';
+        $localimagefile = null;
         $fallbackimagefile = null;
+
         foreach ($coursefull->get_course_overviewfiles() as $file) {
             $isimage = $file->is_valid_image();
+            $mimetype = (string)$file->get_mimetype();
 
-            if ($isimage) {
-                $urlpath = '/' . $file->get_contextid() . '/' . $file->get_component() . '/';
-                $urlpath .= $file->get_filearea() . $file->get_filepath() . $file->get_filename();
+            // CDN-backed course covers store the original URL in source metadata.
+            $sourcemetadata = json_decode((string)$file->get_source(), true);
 
-                $url = \moodle_url::make_file_url(
-                    "$CFG->wwwroot/pluginfile.php",
-                    $urlpath,
-                    !$isimage
-                );
+            if (
+                is_array($sourcemetadata)
+                && ($sourcemetadata['storage'] ?? '') === 'centralstorage_cdn'
+                && !empty($sourcemetadata['source'])
+                && function_exists('repository_centralstorage_public_url')
+            ) {
+                $contenttype = (string)($sourcemetadata['contenttype'] ?? $mimetype);
 
-                $courseimage = $url;
-                break;
+                if (
+                    $isimage
+                    || strpos($mimetype, 'image/') === 0
+                    || strpos($contenttype, 'image/') === 0
+                ) {
+                    // Supports both absolute CDN URLs and relative R2 object paths.
+                    $cdnurl = \repository_centralstorage_public_url(
+                        (string)$sourcemetadata['source'],
+                        'cloudflare',
+                        'image'
+                    );
+
+                    $scheme = strtolower((string)parse_url($cdnurl, PHP_URL_SCHEME));
+                    if (in_array($scheme, ['http', 'https'], true)) {
+                        return $cdnurl;
+                    }
+                }
             }
 
-            // 如果 is_valid_image 判定失败，但 MIME 仍然是 image/*，记录为兜底候选。
-            if ($fallbackimagefile === null && strpos((string)$file->get_mimetype(), 'image/') === 0) {
+            // Remember the first valid Moodle image as a fallback.
+            if ($localimagefile === null && $isimage) {
+                $localimagefile = $file;
+            }
+
+            // Some valid images may fail Moodle's is_valid_image() check.
+            if (
+                $fallbackimagefile === null
+                && strpos($mimetype, 'image/') === 0
+            ) {
                 $fallbackimagefile = $file;
             }
         }
 
-        // 如果没有任何通过 is_valid_image 的文件，但存在 MIME 为 image/* 的概览文件，则使用它作为封面。
-        if (empty($courseimage) && $fallbackimagefile !== null) {
-            $urlpath = '/' . $fallbackimagefile->get_contextid() . '/' . $fallbackimagefile->get_component() . '/';
-            $urlpath .= $fallbackimagefile->get_filearea() . $fallbackimagefile->get_filepath() . $fallbackimagefile->get_filename();
+        // No usable CDN original: fall back to the Moodle local image.
+        $selectedfile = $localimagefile ?? $fallbackimagefile;
 
-            $url = \moodle_url::make_file_url(
-                "$CFG->wwwroot/pluginfile.php",
+        if ($selectedfile !== null) {
+            $urlpath = '/' . $selectedfile->get_contextid()
+                . '/' . $selectedfile->get_component()
+                . '/' . $selectedfile->get_filearea()
+                . $selectedfile->get_filepath()
+                . $selectedfile->get_filename();
+
+            return (string)\moodle_url::make_file_url(
+                $CFG->wwwroot . '/pluginfile.php',
                 $urlpath,
                 false
             );
-
-            $courseimage = $url;
         }
 
-        if (empty($courseimage)) {
-            $type = get_config('block_vitrina', 'coverimagetype');
+        // No course overview image: retain the existing configured fallback.
+        $type = get_config('block_vitrina', 'coverimagetype');
 
-            switch ($type) {
-                case 'generated':
-                    $courseimage = $OUTPUT->get_generated_image_for_id($course->id);
-                    break;
-                case 'none':
-                    $courseimage = '';
-                    break;
-                default:
-                    $courseimage = (string)(new \moodle_url($CFG->wwwroot . '/blocks/vitrina/pix/' .
-                                                                (self::$large ? 'course' : 'course_small') . '.png'));
-            }
+        switch ($type) {
+            case 'generated':
+                return (string)$OUTPUT->get_generated_image_for_id($course->id);
+
+            case 'none':
+                return '';
+
+            default:
+                return (string)new \moodle_url(
+                    $CFG->wwwroot . '/blocks/vitrina/pix/'
+                    . (self::$large ? 'course' : 'course_small')
+                    . '.png'
+                );
         }
-
-        return $courseimage;
     }
 
     /**
