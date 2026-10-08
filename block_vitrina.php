@@ -47,6 +47,7 @@ class block_vitrina extends block_base {
      * @return string
      */
     private function build_auto_category_header_menu(array $categoryids): string {
+        global $CFG;
         $items = [];
 
         foreach ($categoryids as $categoryid) {
@@ -66,8 +67,22 @@ class block_vitrina extends block_base {
                 'categoryid' => $categoryid,
             ]);
 
+            // Use a root-relative URL (leading slash) instead of an absolute
+            // URL so that generated links keep working if the site domain
+            // ($CFG->wwwroot) is ever changed. The path is derived from the
+            // wwwroot, which also covers installs hosted in a subdirectory.
+            $fullurl = $url->out(false);
+            $relpath = $fullurl;
+            if ($CFG->wwwroot !== '' && strpos($fullurl, $CFG->wwwroot) === 0) {
+                $relpath = substr($fullurl, strlen($CFG->wwwroot));
+            }
+            // Ensure the resulting path starts with a single leading slash.
+            if ($relpath === '' || $relpath[0] !== '/') {
+                $relpath = '/' . ltrim($relpath, '/');
+            }
+
             $items[] = \html_writer::link(
-                $url,
+                $relpath,
                 $category->get_formatted_name(),
                 [
                     'class' => 'block_vitrina-autoheader-item',
