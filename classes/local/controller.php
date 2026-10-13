@@ -713,12 +713,24 @@ class controller {
 
         // Append course tags information (if any) below the category line in
         // the hover title. Multiple tags are separated by " | ".
+        // A tag containing "直播" or "live" can also drive the course type
+        // label and the video-camera icon (see below).
         $tagstitle = '';
+        $livetag = '';
         if (\core_tag_tag::is_enabled('core', 'course')) {
             $tags = \core_tag_tag::get_item_tags_array('core', 'course', $course->id);
             if (!empty($tags)) {
                 $tagnames = array_values($tags);
                 $tagstitle = get_string('coursetype_tags_title', 'block_vitrina', implode(' | ', $tagnames));
+                if ($livetag === '') {
+                    foreach ($tagnames as $tagname) {
+                        $normtag = \core_text::strtolower(trim($tagname));
+                        if (strpos($normtag, '直播') !== false || strpos($normtag, 'live') !== false) {
+                            $livetag = (string)$tagname;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -733,6 +745,15 @@ class controller {
         }
         if ($codetitle !== '') {
             $fulltitle = $fulltitle !== '' ? ($fulltitle . "\n" . $codetitle) : $codetitle;
+        }
+
+        if ($livetag !== '') {
+            // A course tag containing "直播"/"live" drives both the label text
+            // and the video-camera icon, taking precedence over the field value.
+            $course->hascoursetype = true;
+            $course->coursetype = $livetag;
+            $course->coursetypeiconhtml = self::get_coursetype_icon_html('', $fulltitle, 'video-camera');
+            return;
         }
 
         if ($label === '') {
@@ -758,15 +779,18 @@ class controller {
     * @param string|null $title Optional hover title (e.g. course category label).
      * @return string Safe HTML snippet with a Boost/FontAwesome icon.
      */
-    protected static function get_coursetype_icon_html(string $label, ?string $title = null): string {
+    protected static function get_coursetype_icon_html(string $label, ?string $title = null, string $forceicon = ''): string {
         // Normalise label for matching.
         $norm = \core_text::strtolower(trim($label));
 
         // Default icon.
         $icon = 'book';
 
-        // Simple heuristics based on common Chinese and English terms.
-        if (strpos($norm, '电子') !== false || strpos($norm, '线上') !== false ||
+        // If an explicit icon was requested (e.g. a "live" tag matched), use it
+        // directly instead of running the keyword heuristics below.
+        if ($forceicon !== '') {
+            $icon = $forceicon;
+        } else if (strpos($norm, '电子') !== false || strpos($norm, '线上') !== false ||
                 strpos($norm, '网课') !== false || strpos($norm, 'online') !== false ||
                 strpos($norm, 'e-learning') !== false || strpos($norm, 'elearning') !== false) {
             $icon = 'desktop';
