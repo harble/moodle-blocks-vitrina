@@ -569,9 +569,14 @@ function setupLineControls(uniqueid, $blockcontent) {
         var hasMoreLink = $tabcontent.find('.loadmore[href]').length > 0;
 
         if (atEnd && hasMore && hasMoreLink) {
+            // The loadmore link carries the configured "open detail in" target
+            // (block_vitrina/opendetailstarget) in its target attribute, so the
+            // "More..." button must honour it just like the tile-mode loadmore
+            // button does (instead of always navigating in the current window).
             var $more = $tabcontent.find('.loadmore[href]').first();
-            if (window.target && $more.attr('target')) {
-                window.open($more.attr('href'), $more.attr('target'));
+            var moreTarget = $more.attr('target') || '_self';
+            if (moreTarget === '_blank') {
+                window.open($more.attr('href'), '_blank');
             } else {
                 window.location.href = $more.attr('href');
             }
