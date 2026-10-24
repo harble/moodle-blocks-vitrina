@@ -1182,3 +1182,154 @@
     color: #fff;
     text-decoration: none;
 }
+
+/* =========================================================================
+ * Single line (horizontal scroll) display mode.
+ * ========================================================================= */
+.vitrina-layout-line .block_vitrina-tabcontent .courses-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    /* The global mobile media query centers the list, which would clip the
+       first course from the left when the row overflows. Line mode scrolls
+       horizontally, so the list must always start from the left edge. */
+    justify-content: flex-start;
+}
+
+.vitrina-layout-line .block_vitrina-tabcontent .courses-list::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.vitrina-layout-line .block_vitrina-tabcontent .courses-list::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+.vitrina-layout-line .block_vitrina-tabcontent .courses-list .coursebox {
+    flex: 0 0 auto;
+    width: 300px;
+    max-width: 80vw;
+    margin-right: 15px;
+}
+
+.vitrina-layout-line .block_vitrina-tabcontent {
+    position: relative;
+}
+
+/* Never show the "view more" button in single-line mode; it is replaced by
+   the "More" state of the right arrow. Use !important so any JS show() /
+   class toggling that would otherwise reveal it is overridden. */
+.vitrina-layout-line .block_vitrina-tabcontent .loadmore {
+    display: none !important;
+}
+
+/* Put the tab bar and the shared single-line controls on the same row,
+   with the controls always on the right side of the tab bar. */
+.vitrina-layout-line .block_vitrina-line-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    /* Give a little breathing room below the header so that the controls,
+       which wrap to their own line on small screens, do not sit flush against
+       the bottom divider line. */
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.vitrina-layout-line .block_vitrina-line-header > .block_vitrina-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+    border-bottom: none;
+}
+
+.vitrina-layout-line .vitrina-line-controls {
+    display: none;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    min-height: 24px;
+    flex: 0 0 auto;
+}
+
+.vitrina-layout-line.has-overflow .vitrina-line-controls {
+    display: flex;
+}
+
+/* In "more only" mode there is no horizontal overflow, so pagination is not
+   needed: hide the page indicator and the prev arrow, leaving just the
+   "More..." action on the right. */
+.vitrina-layout-line.vitrina-line-moreonly .vitrina-line-count,
+.vitrina-layout-line.vitrina-line-moreonly .vitrina-line-prev {
+    display: none;
+}
+
+.vitrina-line-controls .vitrina-line-count {
+    display: inline-flex;
+    align-items: center;
+    color: #666;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: default;
+    margin-right: 8px;
+}
+
+/* The "More" text span inside an arrow is hidden by default and is only
+   shown when the arrow is in the "More" button state. This ensures the
+   text disappears again when scrolling back left. */
+.vitrina-line-controls .vitrina-line-arrow .vitrina-line-more-text {
+    display: none;
+}
+
+.vitrina-line-controls .vitrina-line-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #5f534c;
+    background: #fff;
+    color: #5f534c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+.vitrina-line-controls .vitrina-line-arrow .vitrina-line-arrow-icon {
+    transform: translateX(5px);
+}
+
+.vitrina-line-controls .vitrina-line-arrow:hover {
+    background-color: #8d7e78;
+    color: #fff;
+}
+
+.vitrina-line-controls .vitrina-line-arrow.vitrina-line-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.vitrina-line-controls .vitrina-line-arrow.vitrina-line-more-btn {
+    width: auto;
+    min-width: 52px;
+    border-radius: 16px;
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.vitrina-line-controls .vitrina-line-arrow.vitrina-line-more-btn .vitrina-line-more-text {
+    display: inline;
+}
+
+.vitrina-line-controls .vitrina-line-arrow.vitrina-line-more-btn .vitrina-line-arrow-icon {
+    display: none;
+}

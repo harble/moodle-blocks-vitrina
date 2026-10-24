@@ -112,6 +112,8 @@ class main implements renderable, templatable {
             'categoryid' => $this->categoryid,
             // 'opendetailstarget' => get_config('block_vitrina', 'opendetailstarget'),
             'opendetailstarget' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'opendetailstarget'),
+            'layoutmode' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'layoutmode') ?: 'tile',
+            'inline' => main::get_config_ex( $this->instanceid?:0,'block_vitrina', 'layoutmode') === 'line',
         ];
 
         return $defaultvariables;

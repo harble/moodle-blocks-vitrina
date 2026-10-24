@@ -59,6 +59,8 @@ var strings = [
     {key: 'nocoursesview', component: 'block_vitrina'},
     {key: 'nomorecourses', component: 'block_vitrina'},
     {key: 'loadmoreloadedcount', component: 'block_vitrina'},
+    {key: 'viewall', component: 'block_vitrina'},
+    {key: 'layoutmode_more', component: 'block_vitrina'},
 ];
 var s = [];
 
@@ -283,6 +285,7 @@ function loadCourses(uniqueid, $tabcontent) {
             $tabcontent.removeClass('loading');
 
             updateLoadMoreButtonLabel(uniqueid, $tabcontent);
+            refreshLineMode(uniqueid, $tabcontent);
 
             if (paging[uniqueid][view].ended) {
                 // If this tab for this uniqueid has no courses at all
@@ -339,6 +342,277 @@ function loadCourses(uniqueid, $tabcontent) {
         }
     }]);
 
+}
+
+/**
+ * Refresh the single-line (horizontal scroll) controls for a tab content.
+ *
+ * Shows the controls only when there is overflow, updates the "N/Count"
+ * indicator, toggles the disabled state of the arrows and turns the right
+ * arrow into a "More" button when scrolled to the end AND a "view more"
+ * link is available for this tab.
+ *
+ * @param {integer} uniqueid
+ * @param {object} $tabcontent
+ */
+function refreshLineMode(uniqueid, $tabcontent) {
+    var $blockcontent = $tabcontent.closest('.block_vitrina-content');
+    if (!$blockcontent.hasClass('vitrina-layout-line')) {
+        return;
+    }
+
+    // The N/Pages indicator (".vitrina-line-controls") is shared at block
+    // level, so it MUST reflect only the currently active tab. When another
+    // tab is clicked away, its list becomes display:none and its ResizeObserver
+    // fires a delayed refresh with zero/empty data. That would wrongly overwrite
+    // the shared control visibility and hide it. Ignore refreshes for any tab
+    // that is not active so only the active one drives the shared controls.
+    if (!$tabcontent.hasClass('active')) {
+        return;
+    }
+
+    var $list = $tabcontent.find('.courses-list').first();
+    var $controls = $blockcontent.find('.vitrina-line-controls').first();
+    if (!$list.length || !$controls.length) {
+        return;
+    }
+
+    var $current = $controls.find('.vitrina-line-current');
+    var $total = $controls.find('.vitrina-line-total');
+
+    var el = $list[0];
+
+    // Whether there are still more course records not yet loaded/shown.
+    var hasMore = false;
+    var view = $tabcontent.data('view');
+    if (paging[uniqueid] !== undefined && paging[uniqueid][view] !== undefined) {
+        hasMore = !paging[uniqueid][view].ended;
+    }
+
+    // The N/Pages indicator and prev arrow must always be visible whenever
+    // pagination applies (totalPages > 1), even if disabled. A "page" is one
+    // viewport width and paging snaps to full-page boundaries (Math.floor),
+    // so the total page count must use the same floor model as currentPage.
+    // Computing totalPages early lets us drive visibility from it (robust)
+    // instead of from the error-prone geometric overflow calculation below.
+    var pageView = Math.max(1, el.clientWidth);
+    var maxScroll = el.scrollWidth - el.clientWidth;
+
+    // Apply a tolerance to the page count: a tiny overflow (less than a
+    // quarter of a course card width) is treated as "nothing to page
+    // through", so we only show the "More..." action. Once the overflow is
+    // at least a quarter card wide it is worth a second page, so the page
+    // indicator and the arrows stay visible.
+    var cardWidth = 0;
+    var firstCard = $list.children().first()[0];
+    if (firstCard) {
+        cardWidth = firstCard.offsetWidth || 0;
+    }
+    var minOverflow = Math.max(1, cardWidth * 0.25);
+    var totalPages;
+    if (maxScroll <= 0) {
+        totalPages = 1;
+    } else if (maxScroll <= minOverflow) {
+        // Negligible overflow: keep a single page, only "More..." applies.
+        totalPages = 1;
+    } else {
+        // Meaningful overflow: at least a second page.
+        totalPages = Math.max(2, Math.floor(maxScroll / pageView) + 1);
+    }
+
+    // Show the controls whenever the content spans more than one page OR there
+    // is still more to load. When there is nothing to page through but more
+    // records exist, only the "More..." action is relevant.
+    var showcontrols = hasMore || totalPages > 1;
+
+    // Show/hide the whole control bar based on paging and remaining items.
+    // The controls live next to the tab bar, so toggle on the block root.
+    $blockcontent.toggleClass('has-overflow', showcontrols);
+
+    // "More only" mode applies only when there is a single page (nothing to
+    // paginate) but more records exist to load: hide the page indicator and
+    // the prev arrow, leaving just the "More..." action. Whenever totalPages
+    // > 1 this is never set, so N/Pages and the prev arrow stay visible.
+    $blockcontent.toggleClass('vitrina-line-moreonly', hasMore && totalPages <= 1);
+
+    // Determine whether the row is scrolled fully to the end.
+    var atEnd = (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+
+    // The current page must use the same 1/4-card tolerance model as
+    // totalPages: jumping straight to the end (e.g. when the overflow is less
+    // than a full screen but already counts as a second page) should report
+    // the last page instead of a stale floor() value.
+    var currentPage;
+    if (totalPages <= 1 || atEnd) {
+        currentPage = atEnd ? totalPages : 1;
+    } else {
+        currentPage = Math.floor(el.scrollLeft / pageView) + 1;
+        if (currentPage < 1) {
+            currentPage = 1;
+        }
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+    }
+    $current.text(currentPage);
+    $total.text(totalPages);
+
+    // Arrows.
+    var $prev = $controls.find('.vitrina-line-prev');
+    var $next = $controls.find('.vitrina-line-next');
+
+    if (el.scrollLeft <= 0) {
+        $prev.addClass('vitrina-line-disabled');
+    } else {
+        $prev.removeClass('vitrina-line-disabled');
+    }
+
+    // Show the "More..." label on the next arrow when there is more to load
+    // and either we are fully at the end, or the whole row is a tiny overflow
+    // (totalPages <= 1) that does not need pagination but still has more.
+    if ((atEnd || totalPages <= 1) && hasMore) {
+        $next.removeClass('vitrina-line-disabled');
+        if (!$next.hasClass('vitrina-line-more-btn')) {
+            $next.addClass('vitrina-line-more-btn');
+            var moreText = $next.find('.vitrina-line-more-text');
+            if (!moreText.length) {
+                moreText = $('<span class="vitrina-line-more-text"></span>');
+                $next.prepend(moreText);
+            }
+            var moreLabel = s.layoutmode_more || s.viewall || 'More';
+            moreText.text(moreLabel);
+        }
+    } else {
+        $next.removeClass('vitrina-line-more-btn');
+        if (atEnd) {
+            // At the very end and no more records: not clickable.
+            $next.addClass('vitrina-line-disabled');
+        } else {
+            // Can still scroll right: clickable.
+            $next.removeClass('vitrina-line-disabled');
+        }
+    }
+}
+
+/**
+ * Bind the interactive behaviour of the single-line controls for a block.
+ *
+ * The controls are shared at block level (right of the tab bar) and act on
+ * the currently active tab's course list.
+ *
+ * @param {integer} uniqueid
+ * @param {object} $blockcontent
+ */
+function setupLineControls(uniqueid, $blockcontent) {
+    if ($blockcontent.data('vitrina-line-bound')) {
+        return;
+    }
+    $blockcontent.data('vitrina-line-bound', true);
+
+    var $controls = $blockcontent.find('.vitrina-line-controls').first();
+    if (!$controls.length) {
+        return;
+    }
+    var $prev = $controls.find('.vitrina-line-prev');
+    var $next = $controls.find('.vitrina-line-next');
+
+    // Resolve the currently active tabcontent and its course list.
+    // eslint-disable-next-line jsdoc/require-jsdoc
+    function activeTabParts() {
+        var $tabcontent = $blockcontent.find('.block_vitrina-tabcontent.active').first();
+        if (!$tabcontent.length) {
+            $tabcontent = $blockcontent.find('.block_vitrina-tabcontent').first();
+        }
+        var $list = $tabcontent.find('.courses-list').first();
+        return {tabcontent: $tabcontent, list: $list};
+    }
+
+    // Prev: scroll the active tab's list one page (one viewport width) to the left.
+    $prev.on('click', function() {
+        if ($(this).hasClass('vitrina-line-disabled')) {
+            return;
+        }
+        var parts = activeTabParts();
+        var el = parts.list[0];
+        var $tabcontent = parts.tabcontent;
+        if (!el) {
+            return;
+        }
+        var pageView = Math.max(1, el.clientWidth);
+        var target = Math.max(0, Math.floor(el.scrollLeft / pageView) * pageView - pageView);
+        el.scrollLeft = target;
+        window.setTimeout(function() {
+            refreshLineMode(uniqueid, $tabcontent);
+        }, 80);
+    });
+
+    // Next: scroll the active tab's list one card width to the right, or open
+    // the "view more" page when at the end and a "view all" link exists.
+    $next.on('click', function() {
+        if ($(this).hasClass('vitrina-line-disabled') && !$(this).hasClass('vitrina-line-more-btn')) {
+            return;
+        }
+        var parts = activeTabParts();
+        var el = parts.list[0];
+        var $tabcontent = parts.tabcontent;
+        if (!el) {
+            return;
+        }
+        var atEnd = (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+
+        // Whether there are still more course records not yet loaded/shown.
+        var hasMore = false;
+        var view = $tabcontent.data('view');
+        if (paging[uniqueid] !== undefined && paging[uniqueid][view] !== undefined) {
+            hasMore = !paging[uniqueid][view].ended;
+        }
+        var hasMoreLink = $tabcontent.find('.loadmore[href]').length > 0;
+
+        if (atEnd && hasMore && hasMoreLink) {
+            var $more = $tabcontent.find('.loadmore[href]').first();
+            if (window.target && $more.attr('target')) {
+                window.open($more.attr('href'), $more.attr('target'));
+            } else {
+                window.location.href = $more.attr('href');
+            }
+            return;
+        }
+
+        if (atEnd) {
+            return;
+        }
+
+        var pageView = Math.max(1, el.clientWidth);
+        var maxScroll = el.scrollWidth - el.clientWidth;
+        var target = Math.min(maxScroll, (Math.floor(el.scrollLeft / pageView) + 1) * pageView);
+        el.scrollLeft = target;
+        window.setTimeout(function() {
+            refreshLineMode(uniqueid, $tabcontent);
+        }, 100);
+    });
+
+    // Keep the controls in sync while scrolling any tab's course list.
+    $blockcontent.find('.block_vitrina-tabcontent').each(function() {
+        var $tabcontent = $(this);
+        $tabcontent.find('.courses-list').on('scroll', function() {
+            refreshLineMode(uniqueid, $tabcontent);
+        });
+        // Re-evaluate the controls whenever the list is resized (e.g. the
+        // browser window is resized), so the N/Pages indicator and the
+        // arrows are shown/hidden and recomputed dynamically.
+        if (window.ResizeObserver) {
+            var $list = $tabcontent.find('.courses-list').first();
+            var ro = new ResizeObserver(function() {
+                if (uniqueid && uniqueid.length && !loading) {
+                    window.setTimeout(function() {
+                        refreshLineMode(uniqueid, $tabcontent);
+                    }, 20);
+                }
+            });
+            ro.observe($list[0]);
+            $tabcontent.data('vitrina-line-ro', ro);
+        }
+    });
 }
 
 /**
@@ -409,6 +683,17 @@ export const init = (uniqueid = null) => {
                             if (paging[uniqueid][view] === undefined) {
                                 loadCourses(uniqueid, $tabcontent);
                             }
+
+                            // Refresh the single-line controls for the now active tab. The list is
+                            // coming from display:none, so wait until the browser
+                            // has laid it out (next frame) before reading its
+                            // width, otherwise clientWidth/scrollWidth are stale
+                            // (often 0) and the shared controls get hidden.
+                            if ($blockcontent.hasClass('vitrina-layout-line')) {
+                                window.requestAnimationFrame(function() {
+                                    refreshLineMode(uniqueid, $tabcontent);
+                                });
+                            }
                         }
                     });
 
@@ -422,6 +707,8 @@ export const init = (uniqueid = null) => {
 
                         loadCourses(uniqueid, $tabcontent);
                     });
+
+                    setupLineControls(uniqueid, $blockcontent);
                 });
 
                 // Load dynamic buttons.

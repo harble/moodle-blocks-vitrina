@@ -228,6 +228,15 @@ class block_vitrina_edit_form extends block_edit_form {
         // $mform->setDefault('config_templatetype', 1);
         $mform->addHelpButton('config_templatetype', 'templatetype', 'block_vitrina');
 
+        // Layout mode.
+        $layoutOptions = [
+            'tile' => get_string('layoutmode_tile', 'block_vitrina'),
+            'line' => get_string('layoutmode_line', 'block_vitrina'),
+        ];
+        $mform->addElement('select', 'config_layoutmode', get_string('layoutmode', 'block_vitrina'), $layoutOptions);
+        $mform->setDefault('config_layoutmode', 'tile');
+        $mform->addHelpButton('config_layoutmode', 'layoutmode', 'block_vitrina');
+
         // ------
 
         $editoroptions = ['maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->block->context];
