@@ -179,6 +179,13 @@ if ($ADMIN->fulltree) {
     $setting = new localvitrina\admin_setting_configmultiselect_autocomplete($name, $title, $help, $default, $displaylist);
     $settings->add($setting);
 
+    // Exclude courses categories from the catalog.
+    $name = 'block_vitrina/excludecategories';
+    $title = get_string('excludecategories', 'block_vitrina');
+    $help = get_string('excludecategories_help', 'block_vitrina');
+    $setting = new localvitrina\admin_setting_configmultiselect_autocomplete($name, $title, $help, $default, $displaylist);
+    $settings->add($setting);
+
     // General filters.
     $staticfilters = [
                         'fulltext' => get_string('fulltextsearch', 'block_vitrina'),

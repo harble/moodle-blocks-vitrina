@@ -1140,6 +1140,10 @@ class controller {
     ): array {
         global $DB, $CFG;
 
+        // The categories configured to be excluded (and their descendants)
+        // are excluded from the courses query.
+        $excludedids = self::get_exclude_categories_ids();
+
         $availableviews = self::get_courses_views();
         if (!in_array($view, $availableviews)) {
             $view = 'default';
@@ -1181,6 +1185,14 @@ class controller {
             $select .= ' AND category ' . $selectincats;
         }
         // End of categories filter.
+
+        // Exclude the categories configured to be hidden from the catalog
+        // (including their descendants).
+        if (count($excludedids) > 0) {
+            [$selectnotexcl, $paramsnotexcl] = $DB->get_in_or_equal($excludedids, SQL_PARAMS_NAMED, 'excludecat', false);
+            $params = array_merge($params, $paramsnotexcl);
+            $select .= ' AND category ' . $selectnotexcl;
+        }
 
         $joincustomfields = '';
         $customfields = self::get_configuredcustomfields();
@@ -1489,6 +1501,49 @@ class controller {
     }
 
     /**
+     * Get the categories ids configured to be excluded from the catalog,
+     * expanding each selected category to include all of its descendants.
+     *
+     * @return array The category ids (including descendants) to exclude.
+     */
+    public static function get_exclude_categories_ids(): array {
+        global $DB;
+
+        $excluded = get_config('block_vitrina', 'excludecategories');
+
+        if (empty($excluded)) {
+            return [];
+        }
+
+        $ids = array_filter(array_map('intval', explode(',', $excluded)));
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Expand each configured category to include itself and all of its
+        // descendant categories. The "path" field stores the full hierarchy
+        // path (e.g. /1/5/8), so a category matches if it is one of the
+        // configured ids or its path contains one of them.
+        $params = [];
+        [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'exclude');
+        $params = array_merge($params, $inparams);
+
+        $where = ' id ' . $insql;
+        $paramsincr = 0;
+        foreach ($ids as $excludeid) {
+            $param = 'excludepath' . (++$paramsincr);
+            $where .= ' OR path LIKE :' . $param;
+            $params[$param] = '%/' . $excludeid . '/%';
+        }
+
+        $sql = "SELECT id FROM {course_categories} WHERE (" . $where . ")";
+        $rows = $DB->get_fieldset_sql($sql, $params);
+
+        return array_map('intval', $rows);
+    }
+
+    /**
      * Get the available categories list.
      *
      * @param array $selectedlist The selected categories.
@@ -1498,16 +1553,18 @@ class controller {
     public static function get_categories(array $selectedlist = [], bool $nested = false): array {
         global $DB;
 
-        // Always return the full list of visible categories; do not
-        // restrict by the global plugin configuration here. The
-        // selection of which categories are checked by default in the
-        // catalog is handled separately (instance config first,
-        // then global config, then all), while this method is
-        // responsible only for providing the complete tree/list to
-        // render.
+        // The categories configured to be excluded (and their descendants)
+        // are removed from the tree so they are not shown in the catalog.
+        $excludedids = self::get_exclude_categories_ids();
 
         $select = 'visible = 1';
         $params = [];
+
+        if (count($excludedids) > 0) {
+            [$selectnotin, $paramsnotin] = $DB->get_in_or_equal($excludedids, SQL_PARAMS_NAMED, 'notexclude', false);
+            $select .= ' AND id ' . $selectnotin;
+            $params = array_merge($params, $paramsnotin);
+        }
 
         $categories = $DB->get_records_select('course_categories', $select, $params, 'sortorder ASC');
 
