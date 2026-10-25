@@ -160,6 +160,7 @@ $string['showlesscomments'] = 'Hide comments';
 $string['showlongcustomfields'] = 'Show long custom fields';
 $string['showlongcustomfields_help'] = 'Show the custom fields in the dfescription section of the course detail page.';
 $string['showmore'] = 'Show more...';
+$string['startlearning'] = 'Start learning';
 $string['showmorecomments'] = 'Show more comments';
 $string['showtext'] = 'Text only';
 $string['singleamountcourses'] = 'Single amount';

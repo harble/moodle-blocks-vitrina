@@ -159,6 +159,7 @@ $string['showlesscomments'] = '收起评论';
 $string['showlongcustomfields'] = '显示长文本字段';
 $string['showlongcustomfields_help'] = '在课程详情页面的描述部分显示的自定义字段。';
 $string['showmore'] = '显示更多...';
+$string['startlearning'] = '开始学习';
 $string['showmorecomments'] = '显示更多评论';
 $string['showtext'] = '仅文字';
 $string['singleamountcourses'] = '单个视图数量';

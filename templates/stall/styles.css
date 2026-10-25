@@ -4,80 +4,89 @@
 }
 
 .block_vitrina-courseslist .coursebox {
-    width: 255px;
-    min-width: 255px;
-    height: 320px;
-    border-radius: 20px;
+    width: 306px;
+    min-width: 306px;
     margin: 15px 10px 10px;
     position: relative;
-    box-shadow: 0 3px 7px #aaa;
+}
+
+.block_vitrina-courseslist .coursebox .course-cover {
+    position: relative;
+    width: 100%;
+    height: 192px;
+    overflow: hidden;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
+    background-color: #ddd;
+    box-shadow: 0 3px 7px #aaa;
 }
 
-.block_vitrina-courseslist .coursebox .content-initial {
+.block_vitrina-courseslist .coursebox .course-cover .course-cover-mask {
+    position: absolute;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    position: absolute;
-    z-index: 1;
-    border-radius: 0 0 20px 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 15px 15px 5px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: #fff;
+    text-decoration: none;
+    opacity: 0;
+    z-index: 5;
     transition: all 0.3s ease-in-out;
-    min-height: 0;
-    overflow: auto;
 }
 
-.block_vitrina-courseslist .coursebox:hover .content-initial {
-    min-height: 100%;
-    height: 100%;
-    padding-bottom: 25px;
-    border-radius: 20px;
+.block_vitrina-courseslist .coursebox:hover .course-cover .course-cover-mask {
+    background-color: rgba(0, 0, 0, 0.35);
+    opacity: 1;
 }
 
-.block_vitrina-courseslist .coursebox .content-fullinfo {
-    display: none;
-    font-size: 90%;
-    margin-top: 20px;
-}
-
-.block_vitrina-courseslist .coursebox:hover .content-fullinfo {
-    display: block;
-}
-
-.block_vitrina-courseslist .coursebox .content-fullinfo-innerlink {
-    display: block;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #bbb;
-    color: inherit;
+.block_vitrina-courseslist .coursebox .course-cover .course-cover-mask:hover,
+.block_vitrina-courseslist .coursebox .course-cover .course-cover-mask:focus {
+    color: #fff;
     text-decoration: none;
 }
 
-.block_vitrina-courseslist .coursebox .content-fullinfo-innerlink:hover,
-.block_vitrina-courseslist .coursebox .content-fullinfo-innerlink:focus {
-    color: inherit;
-    text-decoration: none;
+.block_vitrina-courseslist .coursebox .course-cover .course-cover-action {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    padding-left: 8px;
 }
 
-.block_vitrina-courseslist .coursebox .content-fullinfo-innerlink .coursesummary {
-    color: inherit;
+.block_vitrina-courseslist .coursebox .course-content {
+    padding: 12px 0;
+    text-align: left;
 }
 
-.block_vitrina-courseslist .coursebox h6 {
-    color: var(--primary);
+.block_vitrina-courseslist .coursebox .course-content .course-name {
+    color: #796b66;
+    font-weight: bold;
+    font-size: 15.5px;
+    letter-spacing: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
+    text-decoration: none;
+    line-height: 1.4;
+    padding-left: 0px;
+    margin: 0 0 5px;
+}
+
+.block_vitrina-courseslist .coursebox .course-content .course-name:hover {
+    color: #796b66;
+    text-decoration: underline;
+    text-underline-offset: 6px;
 }
 
 .block_vitrina-courseslist .coursebox .vitrina-ranking-stars {
     transform-origin: right;
     position: absolute;
-    top: 0;
+    top: 5px;
     right: 5px;
     z-index: 2;
 }
@@ -90,14 +99,6 @@
     left: 0;
 }
 
-.block_vitrina-courseslist .coursebox .course-info-icon {
-    display: none;
-}
-
-.block_vitrina-courseslist .coursebox:hover .course-info-icon {
-    display: flex;
-}
-
 .block_vitrina-courseslist .coursebox .feeinfo {
     display: inline;
     border: 2px solid var(--primary);
@@ -107,18 +108,25 @@
     color: var(--primary);
 }
 
-.block_vitrina-courseslist .coursebox.state-waiting .waiting-label {
+.block_vitrina-courseslist .coursebox .course-cover .waiting-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 15px;
+    text-align: center;
     background-color: transparent;
     text-transform: uppercase;
     font-size: 23px;
     font-weight: bold;
-    border-top: 2px solid;
-    border-bottom: 2px solid;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    color: #fff;
     left: 10px;
     right: 10px;
+    z-index: 2;
 }
 
-.block_vitrina-courseslist .coursebox.state-waiting:hover .waiting-label {
+.block_vitrina-courseslist .coursebox.state-waiting:hover .course-cover .waiting-label {
     display: none;
 }
 

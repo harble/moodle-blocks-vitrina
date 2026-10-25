@@ -151,6 +151,7 @@ $string['showlesscomments'] = 'Ver menos';
 $string['showlongcustomfields'] = 'Campos largos a mostrar';
 $string['showlongcustomfields_help'] = 'Campos que se mostrarán en la sección descriptiva de cada curso en la vista de detalle.';
 $string['showmore'] = 'Ver más...';
+$string['startlearning'] = 'Comenzar a aprender';
 $string['showmorecomments'] = 'Ver más comentarios';
 $string['showtext'] = 'Solo texto';
 $string['singleamountcourses'] = 'Cantidad simple';
