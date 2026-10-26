@@ -53,6 +53,11 @@ class detail implements renderable, templatable {
     public function __construct($course, array $enrolmsg = []) {
 
         \block_vitrina\local\controller::course_preprocess($course, true);
+
+        // Detail banner: use the dedicated course header image first,
+        // then fall back to the course cover image.
+        $course->imagepath = \block_vitrina\local\controller::get_coursebanner($course);
+
         $this->course = $course;
         $this->enrolmsg = $enrolmsg;
     }

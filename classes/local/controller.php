@@ -1060,6 +1060,88 @@ class controller {
     }
 
     /**
+     * Get the course banner image for the detail page.
+     *
+     * Dedicated course header image first (theme_boost_union/courseheaderimage),
+     * then fall back to the course cover image. Both try the CDN original first.
+     *
+     * @param \stdClass $course Course object.
+     * @return string Image url.
+     */
+    public static function get_coursebanner($course): string {
+        global $CFG;
+
+        // Load the central storage URL resolver when the plugin is available.
+        $centralstoragelib = $CFG->dirroot . '/repository/centralstorage/locallib.php';
+        if (is_readable($centralstoragelib)) {
+            require_once($centralstoragelib);
+        }
+
+        // First try the dedicated course header image.
+        try {
+            $coursecontext = \context_course::instance($course->id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files(
+                $coursecontext->id,
+                'theme_boost_union',
+                'courseheaderimage',
+                0,
+                'itemid',
+                false
+            );
+        } catch (\Exception $e) {
+            $files = [];
+        }
+
+        $headerfile = reset($files);
+
+        if ($headerfile) {
+            $isimage = $headerfile->is_valid_image();
+            $mimetype = (string)$headerfile->get_mimetype();
+
+            $sourcemetadata = json_decode((string)$headerfile->get_source(), true);
+
+            if (
+                is_array($sourcemetadata)
+                && ($sourcemetadata['storage'] ?? '') === 'centralstorage_cdn'
+                && !empty($sourcemetadata['source'])
+                && function_exists('repository_centralstorage_public_url')
+            ) {
+                $contenttype = (string)($sourcemetadata['contenttype'] ?? $mimetype);
+
+                if ($isimage || strpos($mimetype, 'image/') === 0 || strpos($contenttype, 'image/') === 0) {
+                    $cdnurl = \repository_centralstorage_public_url(
+                        (string)$sourcemetadata['source'],
+                        'cloudflare',
+                        'image'
+                    );
+
+                    $scheme = strtolower((string)parse_url($cdnurl, PHP_URL_SCHEME));
+                    if (in_array($scheme, ['http', 'https'], true)) {
+                        return $cdnurl;
+                    }
+                }
+            }
+
+            // Local pluginfile fallback for the dedicated header image.
+            $urlpath = '/' . $headerfile->get_contextid()
+                . '/' . $headerfile->get_component()
+                . '/' . $headerfile->get_filearea()
+                . $headerfile->get_filepath()
+                . $headerfile->get_filename();
+
+            return (string)\moodle_url::make_file_url(
+                $CFG->wwwroot . '/pluginfile.php',
+                $urlpath,
+                false
+            );
+        }
+
+        // No dedicated header image: fall back to the course cover image logic.
+        return self::get_courseimage($course);
+    }
+
+    /**
      * Include a CSS file according the current used template.
      *
      * @return void
