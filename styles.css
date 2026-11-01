@@ -1,5 +1,5 @@
 .block_vitrina-courseslist .coursebox.panel {
-    width: 285px;
+    width: 275px;
     margin: 0 4px 10px;
     overflow: hidden;
     position: relative;
@@ -1197,6 +1197,7 @@
        first course from the left when the row overflows. Line mode scrolls
        horizontally, so the list must always start from the left edge. */
     justify-content: flex-start;
+    gap: 0;
 }
 
 .vitrina-layout-line .block_vitrina-tabcontent .courses-list::-webkit-scrollbar {
@@ -1211,7 +1212,7 @@
 
 .vitrina-layout-line .block_vitrina-tabcontent .courses-list .coursebox {
     flex: 0 0 auto;
-    width: 300px;
+    width: 247px;
     max-width: 80vw;
     margin-right: 15px;
 }

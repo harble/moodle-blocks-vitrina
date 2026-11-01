@@ -333,7 +333,7 @@ html:has(body#page-blocks-vitrina-detail) {
 
 .coursebox .vitrina-ranking-stars
 {
-    transform-origin: center;
+    transform-origin: left;
 }
 
 #page-blocks-vitrina-detail .course-detail .vitrina-ranking-stars .vitrina-ranking-stars-bar::after, .vitrina-ranking-stars-bar::after {

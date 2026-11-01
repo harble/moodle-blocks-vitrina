@@ -96,7 +96,7 @@
 }
 
 .coursebox .vitrina-ranking-stars {
-    transform-origin: center;
+    transform-origin: left;
 }
 
 .block_vitrina-courseslist .coursebox .course-type-label {
