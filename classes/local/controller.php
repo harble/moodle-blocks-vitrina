@@ -330,11 +330,22 @@ class controller {
                 $course->comments = null;
             }
 
-            // Search related courses by tags.
+            // Search related courses.
             $course->hasrelated = false;
             $course->related = [];
             $related = [];
             $relatedlimit = get_config('block_vitrina', 'relatedlimit');
+
+            // Random sort expression, using the correct function for each database vendor.
+            $randomsql = 'RAND()';
+            $dbvendor = $DB->get_dbvendor();
+            if ($dbvendor === 'pgsql') {
+                $randomsql = 'RANDOM()';
+            } else if ($dbvendor === 'mssql') {
+                $randomsql = 'NEWID()';
+            } else if ($dbvendor === 'oci') {
+                $randomsql = 'DBMS_RANDOM.VALUE';
+            }
 
             $categories = get_config('block_vitrina', 'categories');
 
@@ -346,55 +357,86 @@ class controller {
                 }
             }
 
+            // Global category restriction, only applied to the generic fallback steps.
             $categoriescondition = '';
             if (count($categoriesids) > 0) {
                 $categoriescondition = " AND c.category IN (" . implode(',', $categoriesids) . ")";
             }
 
-            if (!empty($relatedlimit) && \core_tag_tag::is_enabled('core', 'course')) {
-                // Get the course tags.
-                $tags = \core_tag_tag::get_item_tags_array('core', 'course', $course->id);
+            if (!empty($relatedlimit)) {
+                $courseid = (int)$course->id;
+                $currentcategory = isset($course->category) ? (int)$course->category : 0;
+                $limit = (int)$relatedlimit;
+                $time = time();
 
-                if (count($tags) > 0) {
-                    $ids = [];
-                    foreach ($tags as $key => $tag) {
-                        $ids[] = $key;
+                // Previous related courses, current course and the site must be excluded every time.
+                $excludeandfill = function() use ($courseid, &$related) {
+                    return implode(',', array_map('intval', array_merge([$courseid, SITEID], $related)));
+                };
+
+                // Append the matching ids to recommendations until the limit is reached.
+                $collect = function($sql, $params) use ($DB, $courseid, &$related, $limit) {
+                    if (count($related) >= $limit) {
+                        return;
                     }
-
-                    $sqlintances = "SELECT c.id, c.category FROM {tag_instance} t " .
-                                    " INNER JOIN {course} c ON t.itemtype = 'course' AND c.id = t.itemid AND c.visible = 1" .
-                                    " WHERE t.tagid IN (" . (implode(',', $ids)) . ") " . $categoriescondition .
-                                    " GROUP BY c.id, c.category" .
-                                    " ORDER BY t.timemodified DESC";
-
-                    $instances = $DB->get_records_sql($sqlintances);
-
-                    foreach ($instances as $instance) {
-                        if (
-                            $instance->id != $course->id &&
-                            $instance->id != SITEID &&
-                            count($related) < $relatedlimit &&
-                            !in_array($instance->id, $related)
-                        ) {
-                            $related[] = $instance->id;
+                    $rows = $DB->get_records_sql($sql, $params, 0, $limit - count($related));
+                    foreach ($rows as $row) {
+                        if ((int)$row->id !== $courseid && (int)$row->id !== SITEID && !in_array((int)$row->id, $related)) {
+                            $related[] = (int)$row->id;
                         }
                     }
-                }
-            }
+                };
 
-            if (count($related) < $relatedlimit) {
-                // Exclude previous related courses, current course and the site.
-                $relatedids = implode(',', array_merge($related, [$course->id, SITEID]));
-                $sql = "SELECT id FROM {course} c " .
-                        " WHERE visible = 1 AND (enddate > :enddate OR enddate IS NULL) AND id NOT IN ($relatedids)" .
-                        $categoriescondition .
-                        " ORDER BY startdate DESC";
-                $params = ['enddate' => time()];
-                $othercourses = $DB->get_records_sql($sql, $params, 0, $relatedlimit - count($related));
+                // Reusable visibility + not-expired condition (enddate = 0 means "no end date").
+                $basewhere = function() use ($excludeandfill) {
+                    return "c.visible = 1 AND (c.enddate = 0 OR c.enddate > :enddate)" .
+                           " AND c.id NOT IN (" . $excludeandfill() . ")";
+                };
 
-                foreach ($othercourses as $other) {
-                    $related[] = $other->id;
+                $params = ['enddate' => $time];
+
+                // Current course tags (only if the tag system is enabled).
+                $coursetagslisted = '';
+                if (\core_tag_tag::is_enabled('core', 'course')) {
+                    $tags = \core_tag_tag::get_item_tags_array('core', 'course', $course->id);
+                    if (count($tags) > 0) {
+                        $coursetagslisted = implode(',', array_map('intval', array_keys($tags)));
+                    }
                 }
+
+                // Priority 1: same category and same tag.
+                if (!empty($coursetagslisted) && $currentcategory > 0) {
+                    $sql = "SELECT c.id FROM {course} c " .
+                           " JOIN {tag_instance} t ON t.itemtype = 'course' AND t.itemid = c.id AND t.tagid IN ($coursetagslisted)" .
+                           " WHERE " . $basewhere() . " AND c.category = :curcat" .
+                           " GROUP BY c.id" .
+                           " ORDER BY " . $randomsql;
+                    $collect($sql, array_merge($params, ['curcat' => $currentcategory]));
+                }
+
+                // Priority 2: same category (ignore tags).
+                if ($currentcategory > 0) {
+                    $sql = "SELECT c.id FROM {course} c " .
+                           " WHERE " . $basewhere() . " AND c.category = :curcat" .
+                           " ORDER BY " . $randomsql;
+                    $collect($sql, array_merge($params, ['curcat' => $currentcategory]));
+                }
+
+                // Priority 3: any category sharing a tag.
+                if (!empty($coursetagslisted)) {
+                    $sql = "SELECT c.id FROM {course} c " .
+                           " JOIN {tag_instance} t ON t.itemtype = 'course' AND t.itemid = c.id AND t.tagid IN ($coursetagslisted)" .
+                           " WHERE " . $basewhere() . $categoriescondition .
+                           " GROUP BY c.id" .
+                           " ORDER BY " . $randomsql;
+                    $collect($sql, $params);
+                }
+
+                // Priority 4: fallback to any suitable course.
+                $sql = "SELECT c.id FROM {course} c " .
+                       " WHERE " . $basewhere() . $categoriescondition .
+                       " ORDER BY " . $randomsql;
+                $collect($sql, $params);
             }
 
             if (count($related) > 0) {
