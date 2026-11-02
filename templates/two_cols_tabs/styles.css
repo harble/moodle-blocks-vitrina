@@ -598,6 +598,10 @@ html:has(body#page-blocks-vitrina-detail) {
     gap: 16px;
 }
 
+#page-blocks-vitrina-detail .relatedcourses .block_vitrina-courseslist .coursebox {
+    max-width: 252px;
+}
+
 #page-blocks-vitrina-detail .experts-box > div::after {
     content: "";
     display: block;
