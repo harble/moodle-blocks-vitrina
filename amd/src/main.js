@@ -53,6 +53,14 @@ var $filtersbox = null;
 // Loading courses.
 var loading = false;
 
+// Global categories "select all" tri-state shared between filters() and
+// loadCourses(): 'all' | 'none' | 'single'.
+var gCategoriesSelectAllState = 'all';
+// When in 'single' mode and a node was clicked, the list of category values
+// (the single clicked node). Empty means "run against ALL categories"
+// (node-external trigger).
+var gSingleNodeValues = [];
+
 // Load strings.
 var strings = [
     {key: 'courselinkcopiedtoclipboard', component: 'block_vitrina'},
@@ -186,20 +194,48 @@ function loadCourses(uniqueid, $tabcontent) {
                 values.push($option.val());
             });
 
+            // In "single-node" mode the individual category checkboxes are
+            // hidden, so discard any residual checked state collected above
+            // and decide below what to send.
+            if (key === 'categories' && gCategoriesSelectAllState === 'single') {
+                values = [];
+            }
+
             if (values.length > 0) {
                 filters.push({
                     'values': values,
                     'type': key
                 });
             } else if (key === 'categories') {
-                // User has explicitly unselected all categories.
-                // Send an explicit empty categories filter so the backend can
-                // distinguish this case from "no categories filter" and
-                // return no courses instead of falling back to defaults.
-                filters.push({
-                    'values': [],
-                    'type': key
-                });
+                if (gCategoriesSelectAllState === 'single') {
+                    if (gSingleNodeValues.length > 0) {
+                        // Triggered by clicking a node: filter by that exact
+                        // single node only.
+                        filters.push({
+                            'values': gSingleNodeValues,
+                            'type': key
+                        });
+                    } else {
+                        // Node-external trigger: query across all categories.
+                        var allValues = [];
+                        $control.find('input.filteroption').each(function() {
+                            allValues.push($(this).val());
+                        });
+                        filters.push({
+                            'values': allValues,
+                            'type': key
+                        });
+                    }
+                } else {
+                    // User has explicitly unselected all categories.
+                    // Send an explicit empty categories filter so the backend can
+                    // distinguish this case from "no categories filter" and
+                    // return no courses instead of falling back to defaults.
+                    filters.push({
+                        'values': [],
+                        'type': key
+                    });
+                }
             } else if (key === 'tags') {
                 // When the block instance has configured course tags, they
                 // are shown as a checkbox list (key = "tags"). If the user
@@ -822,8 +858,20 @@ export const catalog = (uniqueid, view, currentinstanceid = 0, currentbypage = 2
 export const filters = (uniqueid, selectedfilters = []) => {
 
     $filtersbox = $('#' + uniqueid);
+    var $categoryControl = $filtersbox.find('.filtercontrol[data-key="categories"]');
 
-    var applyFilters = function() {
+    var applyFilters = function(fromNode) {
+
+        // A node-external trigger while in single-node mode: drop the active
+        // single-node scope and search across ALL categories (as if every
+        // category were selected), and clear the node highlight.
+        if (gCategoriesSelectAllState === 'single' && !fromNode) {
+            gSingleNodeValues = [];
+            if ($categoryControl.length) {
+                $categoryControl.find('.filter-option')
+                    .removeClass('vitrina-node-selected vitrina-node-ancestor');
+            }
+        }
 
         if (!loading) {
             restartSearch(uniqueid);
@@ -847,12 +895,12 @@ export const filters = (uniqueid, selectedfilters = []) => {
         });
     });
 
-    $filtersbox.find('.filtercontrol .filteroptions input').on('change', applyFilters);
-    $filtersbox.find('.filtersort select[name="sort"]').on('change', applyFilters);
-    $filtersbox.find('.filtersortdirection select[name="sortdirection"]').on('change', applyFilters);
-    $filtersbox.find('select[name="tagsfilter"]').on('change', applyFilters);
+    $filtersbox.find('.filtercontrol .filteroptions input').on('change', function() { applyFilters(); });
+    $filtersbox.find('.filtersort select[name="sort"]').on('change', function() { applyFilters(); });
+    $filtersbox.find('.filtersortdirection select[name="sortdirection"]').on('change', function() { applyFilters(); });
+    $filtersbox.find('select[name="tagsfilter"]').on('change', function() { applyFilters(); });
 
-    $filtersbox.find('.filterfulltext button').on('click', applyFilters);
+    $filtersbox.find('.filterfulltext button').on('click', function() { applyFilters(); });
     $filtersbox.find('.filterfulltext input').on('keypress', function(e) {
         if (e.which == 13) {
             applyFilters();
@@ -869,26 +917,46 @@ export const filters = (uniqueid, selectedfilters = []) => {
 
     // Initialize the category filter as a collapsible tree when there are
     // parent categories with children.
-    var $categoryControl = $filtersbox.find('.filtercontrol[data-key="categories"]');
     if ($categoryControl.length) {
 
-        // Keep the state of the optional "select all" checkbox in sync
-        // with the individual category checkboxes.
+        // Keep the state of the optional "select all" checkbox.
         var $selectAllCategories = $categoryControl.find('.vitrina-categories-selectall');
 
-        var syncSelectAllCategories = function() {
+        // Tri-state selector for the categories "select all" checkbox.
+        // 'all'    -> every category selected;
+        // 'none'   -> no category selected (backend returns no courses);
+        // 'single' -> "single-node" mode: category checkboxes are hidden and
+        //             clicking any node selects only that exact single node;
+        //             queries triggered outside the tree (fulltext/sort/...)
+        //             run against ALL categories.
+        var selectAllState = 'all';
+
+        // Sync the "select all" checkbox visual state according to the current
+        // tri-state mode. Pure UI: it never triggers searches.
+        var refreshSelectAllUI = function() {
             if (!$selectAllCategories.length) {
                 return;
             }
 
-            var $allCategoryCheckboxes = $categoryControl.find('input.filteroption');
-            if ($allCategoryCheckboxes.length === 0) {
+            // Drive the visual state through a dedicated data-state attribute so
+            // we never rely on the native :checked / :indeterminate pseudo-classes
+            // (which Boost Union and some browsers render unreliably).
+            if (selectAllState === 'single') {
+                $categoryControl.addClass('vitrina-single-mode');
+                $selectAllCategories.attr('data-state', 'single');
+                $selectAllCategories.prop('indeterminate', false);
                 $selectAllCategories.prop('checked', false);
-                return;
+            } else {
+                $categoryControl.removeClass('vitrina-single-mode');
+                $selectAllCategories.prop('indeterminate', false);
+                if (selectAllState === 'all') {
+                    $selectAllCategories.prop('checked', true);
+                    $selectAllCategories.attr('data-state', 'all');
+                } else {
+                    $selectAllCategories.prop('checked', false);
+                    $selectAllCategories.attr('data-state', 'none');
+                }
             }
-
-            var allChecked = $allCategoryCheckboxes.filter(':checked').length === $allCategoryCheckboxes.length;
-            $selectAllCategories.prop('checked', allChecked);
         };
 
         var updateTreeExpansion = function() {
@@ -908,22 +976,104 @@ export const filters = (uniqueid, selectedfilters = []) => {
 
         // Initial expansion based on any preselected categories.
         updateTreeExpansion();
-        syncSelectAllCategories();
 
-        // Toggle all categories when the "select all" checkbox changes.
+        // Initial sync for the select-all checkbox. The URL parameter
+        // "single=1" makes the catalog page boot directly into single-node
+        // mode (checkbox shows the dash, node checkboxes hidden).
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('single') === '1') {
+            selectAllState = 'single';
+            gCategoriesSelectAllState = 'single';
+            gSingleNodeValues = [];
+            $categoryControl.find('input.filteroption').prop('checked', false);
+        } else {
+            selectAllState = 'all';
+            gCategoriesSelectAllState = 'all';
+        }
+        refreshSelectAllUI();
+
+        // When a node is clicked in "single-node" mode, select that exact single
+        // node (its category value), highlight it and its ancestors, and
+        // trigger a node-scoped search.
         if ($selectAllCategories.length) {
-            $selectAllCategories.on('change', function() {
-                var checked = $(this).is(':checked');
+            $categoryControl.on('click', '.filter-option label', function(e) {
+                if (selectAllState !== 'single') {
+                    return;
+                }
+                // Prevent the native label->checkbox toggling: in single-node
+                // mode we drive the selection entirely from here.
+                e.preventDefault();
+                e.stopPropagation();
 
-                // Select/unselect all category checkboxes (including children).
-                $categoryControl.find('input.filteroption').prop('checked', checked);
+                var $label = $(this);
+                var $option = $label.closest('.filter-option');
+                var $checkbox = $option.find('.filteroption').first();
+                if (!$checkbox.length || $checkbox.prop('disabled')) {
+                    return;
+                }
 
-                // Update tree UI and re-sync the select-all state.
-                updateTreeExpansion();
-                syncSelectAllCategories();
+                var categoryvalue = String($checkbox.val() || '').trim();
+                if (categoryvalue === '') {
+                    return;
+                }
 
-                // Apply filters so the catalog reloads according to the
-                // new category selection.
+                // Highlight the selected node and all its ancestors.
+                $categoryControl.find('.filter-option').removeClass('vitrina-node-selected');
+                $option.addClass('vitrina-node-selected');
+                $option.parents('.filter-optiongroup').addClass('vitrina-node-ancestor');
+
+                // Store the exact single node as the active scope.
+                gSingleNodeValues = [categoryvalue];
+                gCategoriesSelectAllState = 'single';
+
+                // Expand the tree towards the selected node if collapsed.
+                $option.parents('.filter-optiongroup.haschilds').addClass('expanded');
+                var $icon = $option.parents('.filter-optiongroup.haschilds')
+                    .find('> .filter-option .tree-toggle');
+                $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+
+                applyFilters(true);
+            });
+        }
+
+        // Toggle all categories. Because the "select all" checkbox supports a
+        // third (indeterminate) state, we drive the cycle with click events:
+        // 'all' -> 'none' -> 'single' -> 'all'.
+        if ($selectAllCategories.length) {
+            $selectAllCategories.on('click', function(e) {
+                e.preventDefault();
+
+                var next;
+                if (selectAllState === 'all') {
+                    next = 'none';
+                } else if (selectAllState === 'none') {
+                    next = 'single';
+                } else {
+                    next = 'all';
+                }
+
+                selectAllState = next;
+                gCategoriesSelectAllState = next;
+
+                if (next === 'single') {
+                    // Enter single-node mode: clear any previous node scope.
+                    gSingleNodeValues = [];
+                } else {
+                    gSingleNodeValues = [];
+
+                    // In 'all' and 'none' the select-all checkbox also drives
+                    // the underlying node checkboxes (historical behaviour).
+                    var $allCategoryCheckboxes = $categoryControl.find('input.filteroption');
+                    $allCategoryCheckboxes.prop('checked', (next === 'all'));
+                }
+
+                // Remove node highlighting when leaving single-node mode.
+                if (next !== 'single') {
+                    $categoryControl.find('.filter-option')
+                        .removeClass('vitrina-node-selected vitrina-node-ancestor');
+                }
+
+                refreshSelectAllUI();
                 applyFilters();
             });
         }
@@ -944,10 +1094,23 @@ export const filters = (uniqueid, selectedfilters = []) => {
             }
         });
 
-        // Keep expansion state in sync with checkbox changes.
+        // Keep expansion state in sync with checkbox changes. In single-node
+        // mode the generic change handler is not used (nodes are handled by the
+        // label click binding), but we still refresh the select-all UI.
         $categoryControl.on('change', 'input.filteroption', function() {
             updateTreeExpansion();
-            syncSelectAllCategories();
+            if (selectAllState === 'single') {
+                return;
+            }
+            var $allCategoryCheckboxes = $categoryControl.find('input.filteroption');
+            if ($allCategoryCheckboxes.length === 0) {
+                selectAllState = 'none';
+            } else {
+                selectAllState = ($allCategoryCheckboxes.filter(':checked').length === $allCategoryCheckboxes.length)
+                    ? 'all' : 'none';
+            }
+            gCategoriesSelectAllState = selectAllState;
+            refreshSelectAllUI();
         });
     }
 

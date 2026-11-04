@@ -1334,3 +1334,73 @@
 .vitrina-line-controls .vitrina-line-arrow.vitrina-line-more-btn .vitrina-line-arrow-icon {
     display: none;
 }
+
+/* Custom three-state appearance for the categories "select all" checkbox, driven
+   by the JS-managed data-state attribute (all / none / single) so the visual
+   never depends on the native :checked / :indeterminate rendering (which Boost
+   Union and some browsers handle unreliably). */
+
+.filtercontrol[data-key="categories"] input.vitrina-categories-selectall {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 3px !important;
+    background-color: #fff !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 14px 14px !important;
+    margin: 0 4px 0 0 !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+}
+
+/* "all": blue filled box with a white tick (Boost-style background image). */
+.filtercontrol[data-key="categories"] input.vitrina-categories-selectall[data-state="all"] {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3.5' d='m5.5 10.5 3 3 6-6.5'/%3e%3c/svg%3e") !important;
+}
+
+/* "single" (single-node mode): empty box with a horizontal dash. */
+.filtercontrol[data-key="categories"] input.vitrina-categories-selectall[data-state="single"] {
+    background-color: #fff !important;
+    border-color: #6c757d !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3crect x='3' y='8.25' width='14' height='3.5' rx='1' fill='%236c757d'/%3e%3c/svg%3e") !important;
+}
+
+/* "none": plain empty box. */
+.filtercontrol[data-key="categories"] input.vitrina-categories-selectall[data-state="none"] {
+    background-color: #fff !important;
+    border-color: #6c757d !important;
+    background-image: none !important;
+}
+
+.filtercontrol[data-key="categories"] input.vitrina-categories-selectall:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.filtercontrol[data-key="categories"].vitrina-single-mode .filteroption {
+    display: none !important;
+}
+
+.filtercontrol[data-key="categories"].vitrina-single-mode .filter-option {
+    cursor: pointer;
+}
+
+.filtercontrol[data-key="categories"] .filter-option.vitrina-node-selected > label {
+    font-weight: bold;
+    color: #0d6efd;
+    background: #e7f1ff;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.filtercontrol[data-key="categories"] .filter-optiongroup > .filter-option.vitrina-node-ancestor > label {
+    color: #0d6efd;
+}

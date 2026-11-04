@@ -141,6 +141,7 @@ $string['relatedlimit_help'] = '在课程详情页面中要显示的相关课程
 $string['requireauth'] = '您需要先<a href="{$a}">登录</a>，才能选修本课程';
 $string['returntocatalog'] = '返回课程目录';
 $string['selectcategories'] = '选择课程类别';
+$string['selectalltitle'] = '点击依次切换：全选→全不选→单选模式→全选…';
 $string['selecttags'] = '不限';
 $string['settingsheaderappearance'] = '外观';
 $string['settingsheaderfields'] = '课程字段';
