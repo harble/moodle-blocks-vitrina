@@ -143,7 +143,7 @@ function updateLoadMoreButtonLabel(uniqueid, $tabcontent, forcedloaded = null) {
  * @param {integer} uniqueid
  * @param {object} $tabcontent
  */
-function loadCourses(uniqueid, $tabcontent) {
+function loadCourses(uniqueid, $tabcontent, scrollToTop) {
 
     var view = $tabcontent.data('view');
 
@@ -322,6 +322,28 @@ function loadCourses(uniqueid, $tabcontent) {
 
             updateLoadMoreButtonLabel(uniqueid, $tabcontent);
             refreshLineMode(uniqueid, $tabcontent);
+
+            // After a fresh search, scroll straight to the top of the page so the user
+            // does not have to scroll up to see the new results (e.g. when
+            // triggering a search from the bottom of a long category tree).
+            // Only when explicitly requested by the caller, and only when the
+            // results column top has scrolled more than 150px above the current
+            // window top (otherwise the top of the results is still in view and
+            // no jump is needed).
+            if (scrollToTop) {
+                var $resultscolTop = $('#vitrina-resultscol');
+                var scrollTriggered = $resultscolTop.length &&
+                    $resultscolTop.offset().top < $(window).scrollTop() - 150;
+                if (scrollTriggered) {
+                    if (window.requestAnimationFrame) {
+                        window.requestAnimationFrame(function() {
+                            $('html, body').animate({scrollTop: 0}, 'fast');
+                        });
+                    } else {
+                        $('html, body').animate({scrollTop: 0}, 'fast');
+                    }
+                }
+            }
 
             if (paging[uniqueid][view].ended) {
                 // If this tab for this uniqueid has no courses at all
@@ -875,7 +897,7 @@ export const filters = (uniqueid, selectedfilters = []) => {
 
         if (!loading) {
             restartSearch(uniqueid);
-            loadCourses(uniqueid, $filtersbox.find('.block_vitrina-tabcontent.active'));
+            loadCourses(uniqueid, $filtersbox.find('.block_vitrina-tabcontent.active'), true);
         }
     };
 
