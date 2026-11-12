@@ -105,17 +105,23 @@
                 {{#filtercontrols}}
                     <div class="filtercontrol" data-key="{{key}}">
                         {{#is_categories}}
-                            <div class="filter-selectall" style="float:left;margin-top:8px;">
-                                <input type="checkbox"
-                                       id="vitrina-categories-selectall-{{uniqueid}}"
-                                       class="vitrina-categories-selectall"
-                                       title="{{#str}}selectalltitle, block_vitrina{{/str}}">
-                                <label for="vitrina-categories-selectall-{{uniqueid}}" style="display:none">
-                                    {{#str}} selectall, core {{/str}}
-                                </label>
-                            </div>
+                            <h5 style="display:flex;align-items:center;">
+                                <span class="filter-selectall" style="flex:0 0 auto;margin-right:6px;">
+                                    <input type="checkbox"
+                                           id="vitrina-categories-selectall-{{uniqueid}}"
+                                           class="vitrina-categories-selectall"
+                                           title="{{#str}}selectalltitle, block_vitrina{{/str}}">
+                                    <label for="vitrina-categories-selectall-{{uniqueid}}" style="display:none">
+                                        {{#str}} selectall, core {{/str}}
+                                    </label>
+                                </span>
+                                <span style="flex:1 1 auto;text-align:center;">{{title}}</span>
+                                <span class="tree-toggle-all icon fa fa-minus-circle" title="{{#str}}toggletreeall, block_vitrina{{/str}}" aria-hidden="true"></span>
+                            </h5>
                         {{/is_categories}}
-                        <h5>{{title}}</h5>                        
+                        {{^is_categories}}
+                            <h5 style="text-align:center;">{{title}}</h5>
+                        {{/is_categories}}                        
                         <ul class="filteroptions">
                             {{#options}}
                                 {{>block_vitrina/filterchild}}

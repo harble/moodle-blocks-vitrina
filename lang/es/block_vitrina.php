@@ -134,6 +134,7 @@ $string['requireauth'] = 'Debe <a href="{$a}">acceder</a> primero para poder mat
 $string['returntocatalog'] = 'Ir al catálogo de cursos';
 $string['selectcategories'] = 'Elija una categoría de curso';
 $string['selectalltitle'] = 'Clic para alternar: Seleccionar todo → No seleccionar → Modo nodo único → Seleccionar todo…';
+$string['toggletreeall'] = 'Expandir o plegar todo el árbol';
 $string['selecttags'] = 'Sin límite';
 $string['settingsheaderappearance'] = 'Apariencia';
 $string['settingsheaderfields'] = 'Campos del curso';

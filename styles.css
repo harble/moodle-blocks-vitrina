@@ -1,5 +1,5 @@
 .block_vitrina-courseslist .coursebox.panel {
-    width: 275px;
+    width: 263px;
     margin: 0 4px 10px;
     overflow: hidden;
     position: relative;
@@ -1005,6 +1005,20 @@
     margin-left: 4px;
     cursor: pointer;
     flex-shrink: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.path-blocks-vitrina .filtercontrol h5 .filter-selectall {
+    flex: 0 0 auto;
+    margin-left: -5px;
+}
+
+.path-blocks-vitrina .filtercontrol h5 .tree-toggle-all {
+    flex: 0 0 auto;
+    margin-left: 6px;
+    margin-right: 3px;
+    cursor: pointer;
     font-size: 0.9rem;
     color: #6c757d;
 }

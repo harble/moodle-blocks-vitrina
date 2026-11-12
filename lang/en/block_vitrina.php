@@ -143,6 +143,7 @@ $string['requireauth'] = 'You need <a href="{$a}">login</a> in order to enroll t
 $string['returntocatalog'] = 'Go to Catalog';
 $string['selectcategories'] = 'Choose a course category';
 $string['selectalltitle'] = 'Click to cycle: Select all → Select none → Single-node mode → Select all…';
+$string['toggletreeall'] = 'Expand or collapse the whole tree';
 $string['selecttags'] = 'No limit';
 $string['settingsheaderappearance'] = 'Appearance';
 $string['settingsheaderfields'] = 'Course fields';
