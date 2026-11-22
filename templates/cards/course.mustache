@@ -90,12 +90,12 @@
         {{/hasprogress}}
 
         <div class="content-fullinfo">
-            <a title="{{{shortname}}}" class="content-fullinfo-innerlink" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}" target="{{opendetailstarget}}">
+            <a title="{{{shortname}}}" class="content-fullinfo-innerlink" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}{{/hascourseurl}}" target="{{opendetailstarget}}">
                 <div class="coursesummary">
                     {{{summary}}}
                 </div>
             </a>
-            <a title="{{{shortname}}}" class="coursebtn submit btn btn-primary" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}" target="{{opendetailstarget}}">
+            <a title="{{{shortname}}}" class="coursebtn submit btn btn-primary" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}{{/hascourseurl}}" target="{{opendetailstarget}}">
                 <span class="get_stringlink">{{# str }} showmore, block_vitrina {{/ str }}</span>
             </a>
         </div>
@@ -104,5 +104,5 @@
     {{^active}}
         <div class="waiting-label">{{#str}}waiting, block_vitrina{{/str}}</div>
     {{/active}}
-    <a class="course-info-icon" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="_blank" title="{{#str}}coursedetail, block_vitrina{{/str}}">i</a>
+    <a class="course-info-icon" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}{{/hascourseurl}}" target="_blank" title="{{#str}}coursedetail, block_vitrina{{/str}}">i</a>
 </div>

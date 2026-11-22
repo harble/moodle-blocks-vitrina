@@ -52,7 +52,7 @@
             {{/rating}}
         {{/hasrating}}
 
-        <a class="course-cover-mask" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}" target="{{opendetailstarget}}" title="{{#str}}startlearning, block_vitrina{{/str}}">
+        <a class="course-cover-mask" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}{{/hascourseurl}}" target="{{opendetailstarget}}" title="{{#str}}startlearning, block_vitrina{{/str}}">
             <span class="course-cover-action">{{#str}}startlearning, block_vitrina{{/str}}</span>
         </a>
 
@@ -78,7 +78,7 @@
     </div>
 
     <div class="course-content">
-        <a class="course-name" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}" target="{{opendetailstarget}}" title="{{{fullname}}}">{{{fullname}}}</a>
+        <a class="course-name" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&amp;direct=1&amp;instanceid={{{instanceid}}}{{/hascourseurl}}" target="{{opendetailstarget}}" title="{{{fullname}}}">{{{fullname}}}</a>
 
         {{#fee}}
             <div class="coursefee">

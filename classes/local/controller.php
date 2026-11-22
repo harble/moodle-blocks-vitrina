@@ -50,6 +50,11 @@ class controller {
     protected static $cachedcodefield = null;
 
     /**
+     * @var int Cached course url field id.
+     */
+    protected static $cachedcourseurlfield = null;
+
+    /**
      * @var bool True if load full information about the course.
      */
     protected static $large = false;
@@ -695,22 +700,50 @@ class controller {
             }
         }
 
-        if (self::$coursetypefield === false) {
-            // No suitable field configured.
+        $field = self::$coursetypefield;
+        $courseurlfield = self::get_courseurlfield();
+
+        if ($field === false && !$courseurlfield) {
+            // No suitable custom field configured.
             $course->hascoursetype = false;
+            $course->hascourseurl = false;
+            $course->courseurl = null;
             return;
         }
 
-        $field = self::$coursetypefield;
-
-        // Use core customfield API to get the human-readable value.
+        // Use core customfield API to load every custom field value for the
+        // course with a single query (no per-field queries are needed).
         $handler = \core_customfield\handler::get_handler('core_course', 'course');
         if (!$handler) {
             $course->hascoursetype = false;
+            $course->hascourseurl = false;
+            $course->courseurl = null;
             return;
         }
 
         $datas = $handler->get_instance_data($course->id);
+
+        // Reuse the already loaded data to resolve the custom redirect url.
+        $course->hascourseurl = false;
+        $course->courseurl = null;
+        if ($courseurlfield) {
+            foreach ($datas as $data) {
+                if ((int)$data->get_field()->get('id') === (int)$courseurlfield->id) {
+                    $courseurl = trim((string)$data->get_value());
+                    if ($courseurl !== '') {
+                        $course->courseurl = self::build_courseurl($courseurl, $course->id);
+                        $course->hascourseurl = true;
+                    }
+                    break;
+                }
+            }
+        }
+
+        if ($field === false) {
+            // No suitable field configured for the course type display.
+            $course->hascoursetype = false;
+            return;
+        }
 
         $label = '';
         $codevalue = '';
@@ -812,6 +845,28 @@ class controller {
         $course->hascoursetype = true;
         $course->coursetype = $label;
         $course->coursetypeiconhtml = self::get_coursetype_icon_html($label, $fulltitle);
+    }
+
+    /**
+     * Append the course id to the base url stored in the course_url custom field.
+     *
+     * @param string $baseurl Base url from the custom field value.
+     * @param int $courseid Course id.
+     * @return string Final url with the course id appended.
+     */
+    protected static function build_courseurl(string $baseurl, int $courseid): string {
+        if (substr($baseurl, -3) === 'id=') {
+            // Field already ends with "id=", append the course id directly.
+            $baseurl = $baseurl . $courseid;
+        } else if (strpos($baseurl, '?') !== false) {
+            // Field already contains query parameters, append with "&id=".
+            $baseurl = $baseurl . '&id=' . $courseid;
+        } else {
+            // No query parameters, append with "?id=".
+            $baseurl = $baseurl . '?id=' . $courseid;
+        }
+
+        return $baseurl;
     }
 
     /**
@@ -919,6 +974,29 @@ class controller {
         }
 
         return self::$cachedcodefield ?? null;
+    }
+
+    /**
+     * Get the custom field with shortname 'course_url'.
+     *
+     * @return object|null The course url field.
+     */
+    public static function get_courseurlfield(): ?object {
+        global $DB;
+
+        if (self::$cachedcourseurlfield === null) {
+            self::$cachedcourseurlfield = false;
+
+            $sql = "SELECT cf.* FROM {customfield_field} cf " .
+            " INNER JOIN {customfield_category} cc ON cc.id = cf.categoryid AND cc.component = 'core_course'" .
+            " WHERE cf.shortname = :shortname";
+            $field = $DB->get_record_sql($sql, ['shortname' => 'course_url'], IGNORE_MULTIPLE);
+            if ($field) {
+                self::$cachedcourseurlfield = $field;
+            }
+        }
+
+        return self::$cachedcourseurlfield ?: null;
     }
 
     /**

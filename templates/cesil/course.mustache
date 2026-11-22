@@ -41,14 +41,14 @@
     }
 }}
 
-<div class="panel panel-default coursebox coursecategory-{{category}} state-{{#active}}active{{/active}}{{^active}}waiting{{/active}} {{#premium}}type-premium{{/premium}}{{#completed}} coursecompleted{{/completed}}" data-vitrina-detailurl="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" data-vitrina-detailtarget="{{opendetailstarget}}">
+<div class="panel panel-default coursebox coursecategory-{{category}} state-{{#active}}active{{/active}}{{^active}}waiting{{/active}} {{#premium}}type-premium{{/premium}}{{#completed}} coursecompleted{{/completed}}" data-vitrina-detailurl="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1{{/hascourseurl}}" data-vitrina-detailtarget="{{opendetailstarget}}">
     <div class="panel-heading">
-        <a class="" title="{{{fullname}}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1">
+        <a class="" title="{{{fullname}}}" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1{{/hascourseurl}}">
             {{{fullname}}}
         </a>
     </div>
     <div class="panel-body clearfix">
-        <a class="courseimage-link" title="{{summarytitle}}" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1" target="{{opendetailstarget}}">
+        <a class="courseimage-link" title="{{summarytitle}}" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1{{/hascourseurl}}" target="{{opendetailstarget}}">
             <div class="courseimage" {{#imagepath}}style="background-image: url({{imagepath}});"{{/imagepath}}></div>
             {{#hasmeetingstatus}}
             <div class="meeting-status-wrapper">
@@ -115,5 +115,5 @@
     {{^active}}
         <div class="waiting-label">{{#str}}waiting, block_vitrina{{/str}}</div>
     {{/active}}
-    <a class="course-info-icon" href="{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}" target="_blank" title="{{#str}}coursedetail, block_vitrina{{/str}}">i</a>
+    <a class="course-info-icon" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}{{/hascourseurl}}" target="_blank" title="{{#str}}coursedetail, block_vitrina{{/str}}">i</a>
 </div>
