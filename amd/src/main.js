@@ -165,6 +165,44 @@ function setupCourseActionsMenus() {
             });
         }
     });
+
+    // Add a course to / remove a course from the user favorites.
+    $(document).on('click', '.course-actions-favorite', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $item = $(this);
+        var courseid = $item.data('courseid');
+        var isfavorite = parseInt($item.data('isfavorite'), 10) === 1;
+        var favorite = !isfavorite;
+
+        Ajax.call([{
+            methodname: 'block_vitrina_toggle_favorite',
+            args: {
+                'courseid': courseid,
+                'favorite': favorite
+            },
+            done: function(data) {
+                if (data && data.isfavorite !== undefined) {
+                    $('.course-actions-favorite[data-courseid="' + courseid + '"]').each(function() {
+                        var $el = $(this);
+                        $el.data('isfavorite', data.isfavorite ? 1 : 0);
+                        $el.toggleClass('is-favorite', !!data.isfavorite);
+                    });
+                }
+                closeCourseActionsMenu($item.closest('.course-actions-menu'));
+                // Refresh the user_favorites block list in the side drawer, if present.
+                if (window.require && $('.block_user_favorites').length) {
+                    window.require(['block_user_favorites/favorites'], function(favoritesModule) {
+                        if (favoritesModule && typeof favoritesModule.reload === 'function') {
+                            favoritesModule.reload();
+                        }
+                    });
+                }
+            },
+            fail: Notification.exception
+        }]);
+    });
 }
 
 /**

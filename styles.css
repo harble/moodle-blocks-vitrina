@@ -1269,6 +1269,18 @@
     color: #aaa;
 }
 
+.block_vitrina-courseslist .coursebox .course-actions-item.course-actions-favorite .favorite-on {
+    display: none;
+}
+
+.block_vitrina-courseslist .coursebox .course-actions-item.course-actions-favorite.is-favorite .favorite-off {
+    display: none;
+}
+
+.block_vitrina-courseslist .coursebox .course-actions-item.course-actions-favorite.is-favorite .favorite-on {
+    display: block;
+}
+
 /* =========================================================================
  * Single line (horizontal scroll) display mode.
  * ========================================================================= */

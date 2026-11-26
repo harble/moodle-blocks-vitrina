@@ -32,4 +32,11 @@ $functions = [
         'ajax' => true,
         'loginrequired' => false,
     ],
+    'block_vitrina_toggle_favorite' => [
+        'classname' => '\block_vitrina\external\toggle_favorite',
+        'description' => 'Add or remove a course from the user favorites',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];

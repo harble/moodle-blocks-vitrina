@@ -2065,7 +2065,51 @@ class controller {
             }
         }
 
-        $course->hascourseactions = $course->enrolled || $course->canenrol || $course->canunenrol;
+        // Favorite status, based on the user_favorites block plugin.
+        $course->canfavorite = false;
+        $course->isfavorite = false;
+        $course->favoriteurl = '';
+
+        if (isloggedin() && !isguestuser() && class_exists('\\block_user_favorites\\favorites')) {
+            $course->canfavorite = true;
+            $course->favoriteurl = (string)(new \moodle_url('/course/view.php', ['id' => $course->id]));
+            $favoritehashes = self::get_cached_favorite_hashes();
+            $course->isfavorite = isset($favoritehashes[md5($course->favoriteurl)]);
+        }
+
+        $course->hascourseactions = $course->enrolled || $course->canenrol || $course->canunenrol || $course->canfavorite;
+    }
+
+    /**
+     * Return the favorite hashes of the current user, cached per request.
+     *
+     * @return array A list of hash => true pairs.
+     */
+    private static function get_cached_favorite_hashes(): array {
+        global $USER;
+
+        static $cache = null;
+        static $cacheuserid = null;
+
+        if ($cache === null || $cacheuserid !== $USER->id) {
+            $cache = [];
+            $cacheuserid = $USER->id;
+
+            if (!isloggedin() || isguestuser() || !class_exists('\\block_user_favorites\\favorites')) {
+                return $cache;
+            }
+
+            try {
+                $favorites = new \block_user_favorites\favorites((int)$USER->id);
+                foreach ($favorites->get_all() as $favorite) {
+                    $cache[$favorite->hash] = true;
+                }
+            } catch (\Exception $e) {
+                // The favorites table is not available: ignore the favorites status.
+            }
+        }
+
+        return $cache;
     }
 
     /**

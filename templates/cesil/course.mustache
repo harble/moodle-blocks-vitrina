@@ -141,6 +141,12 @@
             <span class="course-actions-item disabled" role="menuitem" aria-disabled="true">{{#str}}notenrollable, block_vitrina{{/str}}</span>
             {{/canenrol}}
             {{/enrolled}}
+            {{#canfavorite}}
+            <a class="course-actions-item course-actions-favorite{{#isfavorite}} is-favorite{{/isfavorite}}" role="menuitem" href="#" data-courseid="{{id}}" data-isfavorite="{{#isfavorite}}1{{/isfavorite}}{{^isfavorite}}0{{/isfavorite}}">
+                <span class="course-favorite-label favorite-off">{{#str}}favoritecourse, block_vitrina{{/str}}</span>
+                <span class="course-favorite-label favorite-on">{{#str}}unfavoritecourse, block_vitrina{{/str}}</span>
+            </a>
+            {{/canfavorite}}
         </div>
     </div>
     {{/hascourseactions}}
