@@ -147,6 +147,9 @@
                 <span class="course-favorite-label favorite-on">{{#str}}unfavoritecourse, block_vitrina{{/str}}</span>
             </a>
             {{/canfavorite}}
+            <a class="course-actions-item course-actions-copylink" role="menuitem" href="#" data-courselink="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}&direct=1{{/hascourseurl}}">
+                <span class="course-copylink-label">{{#str}}copylink, block_vitrina{{/str}}</span>
+            </a>
         </div>
     </div>
     {{/hascourseactions}}

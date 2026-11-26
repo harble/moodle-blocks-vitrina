@@ -203,6 +203,46 @@ function setupCourseActionsMenus() {
             fail: Notification.exception
         }]);
     });
+
+    // Copy the course card link to the clipboard.
+    $(document).on('click', '.course-actions-copylink', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $item = $(this);
+        var link = $item.data('courselink');
+        if (!link) {
+            return;
+        }
+
+        var copyFallback = function() {
+            var $tmp = $('<textarea>')
+                .css({position: 'absolute', left: '-9999px', top: '0'})
+                .val(link)
+                .appendTo(document.body);
+            $tmp.select();
+            document.execCommand('copy');
+            $tmp.remove();
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(link).catch(copyFallback);
+        } else {
+            copyFallback();
+        }
+
+        var $label = $item.find('.course-copylink-label');
+        var originalLabel = $label.text();
+
+        getStrings([{key: 'courselinkcopiedtoclipboard', component: 'block_vitrina'}])
+            .then(function(results) {
+                $label.text(results[0]);
+                window.setTimeout(function() {
+                    $label.text(originalLabel);
+                }, 1600);
+            })
+            .catch(Notification.exception);
+    });
 }
 
 /**

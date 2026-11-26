@@ -76,6 +76,7 @@ $string['unenrolcourse'] = '撤销选课';
 $string['favoritecourse'] = '收藏课程';
 $string['unfavoritecourse'] = '撤销收藏';
 $string['favoritesunavailable'] = '收藏功能不可用。';
+$string['copylink'] = '复制链接';
 $string['enrollavailablepremium'] = '仅高级用户可注册';
 $string['enrolled'] = '您已经选修了该课程！';
 $string['enrolledshort'] = '已选课';

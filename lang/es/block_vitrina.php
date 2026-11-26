@@ -73,6 +73,7 @@ $string['unenrolcourse'] = 'Cancelar matrícula';
 $string['favoritecourse'] = 'Añadir a favoritos';
 $string['unfavoritecourse'] = 'Quitar de favoritos';
 $string['favoritesunavailable'] = 'Los favoritos no están disponibles.';
+$string['copylink'] = 'Copiar enlace';
 $string['enrollavailablepremium'] = 'Matrícula disponible por ser usuario premium';
 $string['enrolled'] = '¡Ya se encuentra matriculado en el curso!';
 $string['enrolledshort'] = 'MATRIC.';

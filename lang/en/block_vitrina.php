@@ -77,6 +77,7 @@ $string['unenrolcourse'] = 'Unenrol from course';
 $string['favoritecourse'] = 'Favorite course';
 $string['unfavoritecourse'] = 'Remove from favorites';
 $string['favoritesunavailable'] = 'Favorites are not available.';
+$string['copylink'] = 'Copy link';
 $string['enrollavailablepremium'] = 'Enroll available for premium users';
 $string['enrolled'] = 'You are enrolled currently!';
 $string['enrolledshort'] = 'enrolled';
