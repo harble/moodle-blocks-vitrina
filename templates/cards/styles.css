@@ -90,11 +90,12 @@
     left: 0;
 }
 
-.block_vitrina-courseslist .coursebox .course-info-icon {
+.block_vitrina-courseslist .coursebox .course-actions-menu {
     display: none;
 }
 
-.block_vitrina-courseslist .coursebox:hover .course-info-icon {
+.block_vitrina-courseslist .coursebox:hover .course-actions-menu,
+.block_vitrina-courseslist .coursebox.course-actions-open .course-actions-menu {
     display: flex;
 }
 

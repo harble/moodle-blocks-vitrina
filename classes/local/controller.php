@@ -2035,6 +2035,37 @@ class controller {
                 }
             }
         }
+
+        // Build the enrol/unenrol links for the course actions menu.
+        $course->canenrol = false;
+        $course->enrolurl = null;
+        $course->canunenrol = false;
+        $course->unenrolurl = null;
+
+        if (isloggedin() && !isguestuser()) {
+            if ($course->enrolled) {
+                // The user is enrolled: try to build a unenrol link from any
+                // enabled and active enrolment instance, the same way as the
+                // "More" menu of the course page does.
+                foreach ($enrolinstances as $instance) {
+                    $enrolplugin = enrol_get_plugin($instance->enrol);
+                    if (!$enrolplugin) {
+                        continue;
+                    }
+                    $unenrolself = $enrolplugin->get_unenrolself_link($instance);
+                    if ($unenrolself) {
+                        $course->unenrolurl = $unenrolself->out(false);
+                        break;
+                    }
+                }
+                $course->canunenrol = !empty($course->unenrolurl);
+            } else if ($course->enrollable) {
+                $course->canenrol = true;
+                $course->enrolurl = (string)(new \moodle_url('/blocks/vitrina/detail.php', ['id' => $course->id, 'direct' => 1]));
+            }
+        }
+
+        $course->hascourseactions = $course->enrolled || $course->canenrol || $course->canunenrol;
     }
 
     /**

@@ -95,6 +95,78 @@ function loadStrings() {
 }
 // End of Load strings.
 
+// Guard to bind the course actions menus only once.
+var courseActionsMenusBound = false;
+
+/**
+ * Close a course actions dropdown.
+ *
+ * @param {object} $menu The dropdown jQuery element.
+ */
+function closeCourseActionsMenu($menu) {
+    $menu.removeClass('menu-open');
+    $menu.closest('.coursebox').removeClass('course-actions-open');
+    $menu.find('.course-actions-toggle').attr('aria-expanded', 'false');
+}
+
+/**
+ * Setup the course actions (three dots) menus interactions.
+ *
+ * The dropdown is rendered by the course templates and can appear in cards
+ * loaded dynamically, so the events are delegated at document level.
+ */
+function setupCourseActionsMenus() {
+
+    if (courseActionsMenusBound) {
+        return;
+    }
+
+    courseActionsMenusBound = true;
+
+    // Toggle the menu when its button is clicked.
+    $(document).on('click', '.course-actions-toggle', function() {
+        var $toggle = $(this);
+        var $menu = $toggle.closest('.course-actions-menu');
+        var $box = $toggle.closest('.coursebox');
+        var isopen = $menu.hasClass('menu-open');
+
+        // Close every other opened menu in the page.
+        $(document).find('.course-actions-menu.menu-open').each(function() {
+            if ($(this)[0] !== $menu[0]) {
+                closeCourseActionsMenu($(this));
+            }
+        });
+
+        if (isopen) {
+            closeCourseActionsMenu($menu);
+        } else {
+            $menu.addClass('menu-open');
+            $box.addClass('course-actions-open');
+            $toggle.attr('aria-expanded', 'true');
+        }
+    });
+
+    // Close the menus when clicking outside of them.
+    $(document).on('click', function(e) {
+        if ($(e.target).closest('.course-actions-menu').length) {
+            return;
+        }
+
+        $(document).find('.course-actions-menu.menu-open').each(function() {
+            closeCourseActionsMenu($(this));
+        });
+    });
+
+    // Close the menus with the Escape key.
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            $(document).find('.course-actions-menu.menu-open').each(function() {
+                closeCourseActionsMenu($(this));
+            });
+        }
+    });
+}
+
 /**
  * Update the load-more button label with loaded count for current tab.
  *
@@ -142,6 +214,7 @@ function updateLoadMoreButtonLabel(uniqueid, $tabcontent, forcedloaded = null) {
  *
  * @param {integer} uniqueid
  * @param {object} $tabcontent
+ * @param {boolean} scrollToTop Whether to scroll to the top of the tab content after loading.
  */
 function loadCourses(uniqueid, $tabcontent, scrollToTop) {
 
@@ -714,6 +787,7 @@ function restartSearch(uniqueid) {
 export const init = (uniqueid = null) => {
 
     loadStrings();
+    setupCourseActionsMenus();
 
     $('[data-vitrina-toggle]').on('click', function() {
         var $this = $(this);
@@ -829,6 +903,8 @@ export const init = (uniqueid = null) => {
  */
 export const detail = () => {
     strings.push({key: 'courselinkcopiedtoclipboard', component: 'block_vitrina'});
+
+    setupCourseActionsMenus();
 
     $('input[name="courselink"]').on('click', function() {
         var $input = $(this);

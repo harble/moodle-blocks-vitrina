@@ -113,5 +113,33 @@
     {{^active}}
         <div class="waiting-label">{{#str}}waiting, block_vitrina{{/str}}</div>
     {{/active}}
-    <a class="course-info-icon" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/blocks/vitrina/detail.php?id={{{id}}}{{/hascourseurl}}" target="_blank" title="{{#str}}coursedetail, block_vitrina{{/str}}">i</a>
+    {{#hascourseactions}}
+    <div class="course-actions-menu">
+        <button type="button" class="course-actions-toggle" aria-haspopup="true" aria-expanded="false" title="{{#str}}coursemenu, block_vitrina{{/str}}">
+            <svg class="course-actions-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.2"></circle>
+                <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.2"></circle>
+                <circle cx="12" cy="19" r="2" stroke="currentColor" stroke-width="1.2"></circle>
+            </svg>
+        </button>
+        <div class="course-actions-dropdown" role="menu">
+            {{#enrolled}}
+            {{#canunenrol}}
+            <a class="course-actions-item" role="menuitem" href="{{{unenrolurl}}}">{{#str}}unenrolcourse, block_vitrina{{/str}}</a>
+            {{/canunenrol}}
+            {{^canunenrol}}
+            <a class="course-actions-item" role="menuitem" href="{{#hascourseurl}}{{courseurl}}{{/hascourseurl}}{{^hascourseurl}}{{{baseurl}}}/course/view.php?id={{{id}}}{{/hascourseurl}}" target="{{opendetailstarget}}">{{#str}}gotocourse, block_vitrina{{/str}}</a>
+            {{/canunenrol}}
+            {{/enrolled}}
+            {{^enrolled}}
+            {{#canenrol}}
+            <a class="course-actions-item" role="menuitem" href="{{{enrolurl}}}">{{#str}}enroll, block_vitrina{{/str}}</a>
+            {{/canenrol}}
+            {{^canenrol}}
+            <span class="course-actions-item disabled" role="menuitem" aria-disabled="true">{{#str}}notenrollable, block_vitrina{{/str}}</span>
+            {{/canenrol}}
+            {{/enrolled}}
+        </div>
+    </div>
+    {{/hascourseactions}}
 </div>
