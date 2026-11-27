@@ -554,6 +554,107 @@ function loadCourses(uniqueid, $tabcontent, scrollToTop) {
 }
 
 /**
+ * Compute the paging geometry of a course list.
+ *
+ * Returns {pageView, maxScroll, totalPages} under the same model used by
+ * refreshLineMode: one page equals one viewport width, paging snaps to full
+ * page boundaries, and a trailing overflow narrower than a quarter of a card
+ * is treated as "nothing to page through".
+ *
+ * Uses the cached values stored by refreshLineMode when available, so the
+ * arrow handlers never need to recompute (and never read a transient,
+ * in-flight scrollLeft during a smooth scroll animation).
+ *
+ * @param {object} el The courses-list DOM element.
+ * @param {object} $tabcontent The active tabcontent jQuery object.
+ * @returns {object}
+ */
+function linePaging(el, $tabcontent) {
+    var cachedPages = $tabcontent.data('vitrina-line-totalpages');
+    var cachedView = $tabcontent.data('vitrina-line-pageview');
+    if (typeof cachedPages === 'number' && typeof cachedView === 'number') {
+        return {
+            pageView: cachedView,
+            maxScroll: el.scrollWidth - el.clientWidth,
+            totalPages: cachedPages
+        };
+    }
+    var clientWidth = el.clientWidth;
+    var scrollWidth = el.scrollWidth;
+    var firstCard = el.children[0];
+    var cardWidth = firstCard ? (firstCard.offsetWidth || 0) : 0;
+    var pageView = Math.max(1, clientWidth);
+    var maxScroll = scrollWidth - clientWidth;
+    var minOverflow = Math.max(1, cardWidth * 0.25);
+    var totalPages;
+    if (maxScroll <= minOverflow) {
+        totalPages = 1;
+    } else {
+        totalPages = Math.max(2, Math.ceil(maxScroll / pageView) + 1);
+    }
+    return {pageView: pageView, maxScroll: maxScroll, totalPages: totalPages};
+}
+
+/**
+ * Flag that a programmatic (arrow) page jump is in flight.
+ *
+ * While the flag is set, refreshLineMode keeps the committed current page
+ * index untouched, because the live scrollLeft during a smooth scroll is an
+ * in-flight value that must not overwrite the page the arrows committed to.
+ *
+ * @param {object} $tabcontent The active tabcontent jQuery object.
+ */
+function flagLinePaging($tabcontent) {
+    $tabcontent.data('vitrina-line-paging', true);
+    var timer = $tabcontent.data('vitrina-line-paging-timer');
+    if (timer) {
+        window.clearTimeout(timer);
+    }
+    timer = window.setTimeout(function() {
+        $tabcontent.data('vitrina-line-paging', false);
+    }, 600);
+    $tabcontent.data('vitrina-line-paging-timer', timer);
+}
+
+/**
+ * Commit a new current page for the single-line mode and scroll to it.
+ *
+ * The arrow handlers never derive their jump target from the live scrollLeft
+ * of a running smooth scroll (whose transient value used to absorb clicks and
+ * deadlock on sub-pixel boundaries); they move the committed page index
+ * instead, clamp it to the valid paging range and scroll to the matching page
+ * offset. The committed index is written BEFORE the scroll so that any
+ * refreshLineMode run while the animation is in flight (see flagLinePaging)
+ * keeps the page the arrows committed to.
+ *
+ * @param {object} $tabcontent The active tabcontent jQuery object.
+ * @param {object} el The courses-list DOM element.
+ * @param {object} geometry The paging geometry from linePaging().
+ * @param {integer} targetPage The 1-based page to navigate to.
+ */
+function setLinePage($tabcontent, el, geometry, targetPage) {
+    targetPage = Math.max(1, Math.min(geometry.totalPages, targetPage));
+    var targetLeft = (targetPage - 1) * geometry.pageView;
+    $tabcontent.data('vitrina-line-current', targetPage);
+    flagLinePaging($tabcontent);
+    el.scrollLeft = Math.max(0, Math.min(geometry.maxScroll, targetLeft));
+}
+
+/**
+ * Read the committed current page index (1-based) for a tab content.
+ *
+ * @param {object} $tabcontent The active tabcontent jQuery object.
+ * @returns {integer}
+ */
+function getLineCurrentPage($tabcontent) {
+    var currentPage = $tabcontent.data('vitrina-line-current');
+    if (typeof currentPage !== 'number' || currentPage < 1) {
+        return 1;
+    }
+    return currentPage;
+}
+
+/**
  * Refresh the single-line (horizontal scroll) controls for a tab content.
  *
  * Shows the controls only when there is overflow, updates the "N/Count"
@@ -604,19 +705,23 @@ function refreshLineMode(uniqueid, $tabcontent) {
     // so the total page count must use the same floor model as currentPage.
     // Computing totalPages early lets us drive visibility from it (robust)
     // instead of from the error-prone geometric overflow calculation below.
-    var pageView = Math.max(1, el.clientWidth);
-    var maxScroll = el.scrollWidth - el.clientWidth;
+    // All layout-affecting properties are read once, before any DOM write,
+    // so later reads never force the browser to synchronously recompute the
+    // layout (which would trigger "Forced reflow" warnings).
+    var clientWidth = el.clientWidth;
+    var scrollWidth = el.scrollWidth;
+    var scrollLeft = el.scrollLeft;
+    var firstCard = $list.children().first()[0];
+    var cardWidth = firstCard ? (firstCard.offsetWidth || 0) : 0;
+
+    var pageView = Math.max(1, clientWidth);
+    var maxScroll = scrollWidth - clientWidth;
 
     // Apply a tolerance to the page count: a tiny overflow (less than a
     // quarter of a course card width) is treated as "nothing to page
     // through", so we only show the "More..." action. Once the overflow is
     // at least a quarter card wide it is worth a second page, so the page
     // indicator and the arrows stay visible.
-    var cardWidth = 0;
-    var firstCard = $list.children().first()[0];
-    if (firstCard) {
-        cardWidth = firstCard.offsetWidth || 0;
-    }
     var minOverflow = Math.max(1, cardWidth * 0.25);
     var totalPages;
     if (maxScroll <= 0) {
@@ -631,6 +736,13 @@ function refreshLineMode(uniqueid, $tabcontent) {
         // tail instead of being lumped into the previous page.
         totalPages = Math.max(2, Math.ceil(maxScroll / pageView) + 1);
     }
+
+    // Cache the paging geometry for the arrow handlers (see linePaging), so
+    // they never have to read transient layout values (above all the
+    // in-flight scrollLeft of a smooth scroll animation) to compute their
+    // next jump target.
+    $tabcontent.data('vitrina-line-totalpages', totalPages);
+    $tabcontent.data('vitrina-line-pageview', pageView);
 
     // Show the controls whenever the content spans more than one page OR there
     // is still more to load. When there is nothing to page through but more
@@ -647,33 +759,44 @@ function refreshLineMode(uniqueid, $tabcontent) {
     // > 1 this is never set, so N/Pages and the prev arrow stay visible.
     $blockcontent.toggleClass('vitrina-line-moreonly', hasMore && totalPages <= 1);
 
-    // Determine whether the row is scrolled fully to the end.
-    var atEnd = (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
-
-    // The current page must use the same 1/4-card tolerance model as
-    // totalPages: jumping straight to the end (e.g. when the overflow is less
-    // than a full screen but already counts as a second page) should report
-    // the last page instead of a stale floor() value.
-    var currentPage;
-    if (atEnd) {
-        currentPage = totalPages;
-    } else {
-        currentPage = Math.floor(el.scrollLeft / pageView) + 1;
-        if (currentPage < 1) {
-            currentPage = 1;
-        }
-        if (currentPage > totalPages) {
-            currentPage = totalPages;
-        }
+    // The committed page index (1-based) is the source of truth driving the
+    // arrows. While a programmatic jump is in flight (the paging flag is
+    // set), the live scrollLeft is a transient in-flight value and must NOT
+    // overwrite the committed index. That is exactly why refreshing during a
+    // smooth scroll never re-derives the arrows' page from the moving pixels.
+    // Otherwise, re-sync from the real scroll position (manual scrolling,
+    // window resizes, etc.). A +1px epsilon is added before flooring so a
+    // sub-pixel settle just below a page boundary (e.g. 987.33px in a 987.33
+    // viewport) still counts as the next page instead of rounding all the way
+    // back, which is what made repeated clicks appear to "do nothing".
+    var committedPage = $tabcontent.data('vitrina-line-current');
+    if (typeof committedPage !== 'number' || committedPage < 1) {
+        committedPage = 1;
     }
-    $current.text(currentPage);
+    if (!$tabcontent.data('vitrina-line-paging')) {
+        var livePage;
+        if (scrollLeft + clientWidth >= scrollWidth - 2) {
+            livePage = totalPages;
+        } else {
+            livePage = Math.floor((scrollLeft + 1) / pageView) + 1;
+            if (livePage < 1) {
+                livePage = 1;
+            }
+        }
+        committedPage = Math.min(livePage, totalPages);
+        $tabcontent.data('vitrina-line-current', committedPage);
+    } else if (committedPage > totalPages) {
+        committedPage = totalPages;
+        $tabcontent.data('vitrina-line-current', committedPage);
+    }
+    $current.text(committedPage);
     $total.text(totalPages);
 
     // Arrows.
     var $prev = $controls.find('.vitrina-line-prev');
     var $next = $controls.find('.vitrina-line-next');
 
-    if (el.scrollLeft <= 0) {
+    if (committedPage <= 1) {
         $prev.addClass('vitrina-line-disabled');
     } else {
         $prev.removeClass('vitrina-line-disabled');
@@ -682,7 +805,7 @@ function refreshLineMode(uniqueid, $tabcontent) {
     // Show the "More..." label on the next arrow when there is more to load
     // and either we are fully at the end, or the whole row is a tiny overflow
     // (totalPages <= 1) that does not need pagination but still has more.
-    if ((atEnd || totalPages <= 1) && hasMore) {
+    if ((committedPage >= totalPages || totalPages <= 1) && hasMore) {
         $next.removeClass('vitrina-line-disabled');
         if (!$next.hasClass('vitrina-line-more-btn')) {
             $next.addClass('vitrina-line-more-btn');
@@ -696,7 +819,7 @@ function refreshLineMode(uniqueid, $tabcontent) {
         }
     } else {
         $next.removeClass('vitrina-line-more-btn');
-        if (atEnd) {
+        if (committedPage >= totalPages) {
             // At the very end and no more records: not clickable.
             $next.addClass('vitrina-line-disabled');
         } else {
@@ -739,10 +862,10 @@ function setupLineControls(uniqueid, $blockcontent) {
         return {tabcontent: $tabcontent, list: $list};
     }
 
-    // Prev: snap back to the nearest page boundary (one viewport width) to the
-    // left. Using the previous page factor directly, from the trailing partial
-    // page we return to the previous full page instead of leaping all the way
-    // back to the first page.
+    // Prev: move back one committed page. The target never depends on the live
+    // scrollLeft (which is transient during a smooth scroll animation), only on
+    // the committed page index, so repeated fast clicks can never be absorbed
+    // into the current page or deadlock on a sub-pixel boundary.
     $prev.on('click', function() {
         if ($(this).hasClass('vitrina-line-disabled')) {
             return;
@@ -753,18 +876,14 @@ function setupLineControls(uniqueid, $blockcontent) {
         if (!el) {
             return;
         }
-        var pageView = Math.max(1, el.clientWidth);
-        var maxScroll = el.scrollWidth - el.clientWidth;
-        var target = Math.ceil((el.scrollLeft - pageView) / pageView) * pageView;
-        target = Math.max(0, Math.min(maxScroll, target));
-        el.scrollLeft = target;
-        window.setTimeout(function() {
-            refreshLineMode(uniqueid, $tabcontent);
-        }, 80);
+        setLinePage($tabcontent, el, linePaging(el, $tabcontent), getLineCurrentPage($tabcontent) - 1);
     });
 
-    // Next: scroll the active tab's list one card width to the right, or open
-    // the "view more" page when at the end and a "view all" link exists.
+    // Next: move forward one committed page, or open the "view more" page when
+    // the committed page is already at the end (or the row is a tiny overflow)
+    // and a "view all" link exists. Like Prev, the decision and the jump target
+    // come from the committed page index and the cached paging geometry, never
+    // from the transient scrollLeft of a running smooth scroll.
     $next.on('click', function() {
         if ($(this).hasClass('vitrina-line-disabled') && !$(this).hasClass('vitrina-line-more-btn')) {
             return;
@@ -775,7 +894,9 @@ function setupLineControls(uniqueid, $blockcontent) {
         if (!el) {
             return;
         }
-        var atEnd = (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+
+        var currentPage = getLineCurrentPage($tabcontent);
+        var geometry = linePaging(el, $tabcontent);
 
         // Whether there are still more course records not yet loaded/shown.
         var hasMore = false;
@@ -785,7 +906,7 @@ function setupLineControls(uniqueid, $blockcontent) {
         }
         var hasMoreLink = $tabcontent.find('.loadmore[href]').length > 0;
 
-        if (atEnd && hasMore && hasMoreLink) {
+        if ((currentPage >= geometry.totalPages || geometry.totalPages <= 1) && hasMore && hasMoreLink) {
             // The loadmore link carries the configured "open detail in" target
             // (block_vitrina/opendetailstarget) in its target attribute, so the
             // "More..." button must honour it just like the tile-mode loadmore
@@ -800,24 +921,29 @@ function setupLineControls(uniqueid, $blockcontent) {
             return;
         }
 
-        if (atEnd) {
+        if (currentPage >= geometry.totalPages) {
             return;
         }
 
-        var pageView = Math.max(1, el.clientWidth);
-        var maxScroll = el.scrollWidth - el.clientWidth;
-        var target = Math.min(maxScroll, (Math.floor(el.scrollLeft / pageView) + 1) * pageView);
-        el.scrollLeft = target;
-        window.setTimeout(function() {
-            refreshLineMode(uniqueid, $tabcontent);
-        }, 100);
+        setLinePage($tabcontent, el, geometry, currentPage + 1);
     });
 
-    // Keep the controls in sync while scrolling any tab's course list.
+    // Keep the controls in sync while scrolling any tab's course list. The
+    // handler is throttled to one run per animation frame (a smooth scroll
+    // fires a scroll event each frame) to avoid doing layout reads and DOM
+    // writes several times per frame while the row is animating.
     $blockcontent.find('.block_vitrina-tabcontent').each(function() {
         var $tabcontent = $(this);
+        var rafPending = false;
         $tabcontent.find('.courses-list').on('scroll', function() {
-            refreshLineMode(uniqueid, $tabcontent);
+            if (rafPending) {
+                return;
+            }
+            rafPending = true;
+            window.requestAnimationFrame(function() {
+                rafPending = false;
+                refreshLineMode(uniqueid, $tabcontent);
+            });
         });
         // Re-evaluate the controls whenever the list is resized (e.g. the
         // browser window is resized), so the N/Pages indicator and the
