@@ -1215,7 +1215,7 @@
 .block_vitrina-courseslist .coursebox .course-actions-dropdown {
     display: none;
     position: absolute;
-    bottom: 30px;
+    bottom: 26px;
     right: 0;
     min-width: 160px;
     z-index: 11;

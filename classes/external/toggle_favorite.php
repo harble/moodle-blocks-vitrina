@@ -86,9 +86,6 @@ class toggle_favorite extends external_api {
         }
 
         $course = get_course($params['courseid']);
-        $coursecontext = \context_course::instance($course->id);
-        require_capability('moodle/course:view', $coursecontext);
-
         $url = (string)(new \moodle_url('/course/view.php', ['id' => $course->id]));
         $favorites = new \block_user_favorites\favorites((int)$USER->id);
 
