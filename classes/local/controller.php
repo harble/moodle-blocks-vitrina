@@ -55,6 +55,11 @@ class controller {
     protected static $cachedcourseurlfield = null;
 
     /**
+     * @var int Cached contents field id.
+     */
+    protected static $cachedcontentsfield = null;
+
+    /**
      * @var bool True if load full information about the course.
      */
     protected static $large = false;
@@ -251,6 +256,8 @@ class controller {
         $course->imagepath = self::get_courseimage($course);
 
         // Load course type (first dropdown-type configured custom field), if any.
+        // Also resolves the course url and the course-detail menu flag from the
+        // same customfield data (single query).
         self::load_coursetype_for_course($course);
 
         $ratemanager = self::get_ratemanager();
@@ -483,6 +490,19 @@ class controller {
                         );
                     }
 
+                    // Show the course detail menu only when the contents custom field has content.
+                    $contentsfield = self::get_contentsfield();
+                    if ($contentsfield) {
+                        $contentsvalue = $DB->get_field(
+                            'customfield_data',
+                            'value',
+                            ['fieldid' => $contentsfield->id, 'instanceid' => $one->id]
+                        );
+                        $one->hascoursedetail = !empty(trim((string) $contentsvalue));
+                    } else {
+                        $one->hascoursedetail = false;
+                    }
+
                     if ($ratingavailable) {
                         $one->rating = new \stdClass();
                         $one->rating->total = 0;
@@ -702,12 +722,14 @@ class controller {
 
         $field = self::$coursetypefield;
         $courseurlfield = self::get_courseurlfield();
+        $contentsfield = self::get_contentsfield();
 
-        if ($field === false && !$courseurlfield) {
+        if ($field === false && !$courseurlfield && !$contentsfield) {
             // No suitable custom field configured.
             $course->hascoursetype = false;
             $course->hascourseurl = false;
             $course->courseurl = null;
+            $course->hascoursedetail = false;
             return;
         }
 
@@ -718,6 +740,7 @@ class controller {
             $course->hascoursetype = false;
             $course->hascourseurl = false;
             $course->courseurl = null;
+            $course->hascoursedetail = false;
             return;
         }
 
@@ -734,6 +757,18 @@ class controller {
                         $course->courseurl = self::build_courseurl($courseurl, $course->id);
                         $course->hascourseurl = true;
                     }
+                    break;
+                }
+            }
+        }
+
+        // Reuse the already loaded data to decide whether the course detail
+        // menu must be shown (only when the contents custom field has content).
+        $course->hascoursedetail = false;
+        if ($contentsfield) {
+            foreach ($datas as $data) {
+                if ((int)$data->get_field()->get('id') === (int)$contentsfield->id) {
+                    $course->hascoursedetail = (trim((string)$data->get_value()) !== '');
                     break;
                 }
             }
@@ -997,6 +1032,29 @@ class controller {
         }
 
         return self::$cachedcourseurlfield ?: null;
+    }
+
+    /**
+     * Get the custom field with shortname 'contents' (the Showcase content field).
+     *
+     * @return object|null The contents field.
+     */
+    public static function get_contentsfield(): ?object {
+        global $DB;
+
+        if (self::$cachedcontentsfield === null) {
+            self::$cachedcontentsfield = false;
+
+            $sql = "SELECT cf.* FROM {customfield_field} cf " .
+            " INNER JOIN {customfield_category} cc ON cc.id = cf.categoryid AND cc.component = 'core_course'" .
+            " WHERE cf.shortname = :shortname";
+            $field = $DB->get_record_sql($sql, ['shortname' => 'contents'], IGNORE_MULTIPLE);
+            if ($field) {
+                self::$cachedcontentsfield = $field;
+            }
+        }
+
+        return self::$cachedcontentsfield ?: null;
     }
 
     /**
